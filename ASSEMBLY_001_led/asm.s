@@ -112,8 +112,8 @@ main:
 	ldr r5, [r6]
 	/* movs expects imm8, so this should be fine */
 	movs r4, 0x4
-	orrs r5, r5, r4
-	str r5, [r6]
+	orrs r5, r5, r4 /*Enable GPIOC clock*/
+	str r5, [r6]/*Store the r5 register value to IOPENR register*/
 
 	/* setup PC6 for led 01 for bits 12-13 in MODER */
 	ldr r6, =GPIOC_MODER
