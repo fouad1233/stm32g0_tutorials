@@ -28,9 +28,9 @@
 .equ RCC_BASE,         (0x40021000)          // RCC base address
 .equ RCC_IOPENR,       (RCC_BASE   + (0x34)) // RCC IOPENR register offset
 
-.equ GPIOC_BASE,       (0x50000800)          // GPIOC base address
-.equ GPIOC_MODER,      (GPIOC_BASE + (0x00)) // GPIOC MODER register offset
-.equ GPIOC_ODR,        (GPIOC_BASE + (0x14)) // GPIOC ODR register offset
+.equ GPIOA_BASE,       (0x50000000)          // GPIOC base address?
+.equ GPIOA_MODER,      (GPIOA_BASE + (0x00)) // GPIOC MODER register offset
+.equ GPIOA_ODR,        (GPIOA_BASE + (0x14)) // GPIOC ODR register offset
 
 
 /* vector table, +1 thumb mode */
@@ -107,29 +107,29 @@ Default_Handler:
 /* main function */
 .section .text
 main:
-	/* enable GPIOC clock, bit2 on IOPENR */
+	/* enable GPIOA clock, bit2 on IOPENR (A pinlerinin clogunu aktif ettik)*/
 	ldr r6, =RCC_IOPENR
 	ldr r5, [r6]
 	/* movs expects imm8, so this should be fine */
-	movs r4, 0x4
-	orrs r5, r5, r4 /*Enable GPIOC clock*/
+	movs r4, 0x1
+	orrs r5, r5, r4 /*Enable GPIOA clock*/
 	str r5, [r6]/*Store the r5 register value to IOPENR register*/
 
-	/* setup PC6 for led 01 for bits 12-13 in MODER */
-	ldr r6, =GPIOC_MODER
+	/* setup PA8 for led 01 for bits 12-13 in MODER(PA8'in modunu açtık) */
+	ldr r6, =GPIOA_MODER
 	ldr r5, [r6]
 	/* cannot do with movs, so use pc relative */
-	ldr r4, =0x3000
+	ldr r4, =0x30000
 	mvns r4, r4
 	ands r5, r5, r4
-	ldr r4, =0x1000
+	ldr r4, =0x10000
 	orrs r5, r5, r4
 	str r5, [r6]
 
-	/* turn on led connected to C6 in ODR */
-	ldr r6, =GPIOC_ODR
+	/* turn on led connected to A8 in ODR */
+	ldr r6, =GPIOA_ODR
 	ldr r5, [r6]
-	movs r4, 0x40
+	ldr r4,=0x100 /*A8 e gelen pine 1 göndericem*/
 	orrs r5, r5, r4
 	str r5, [r6]
 
