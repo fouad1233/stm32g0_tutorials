@@ -140,7 +140,7 @@ main:
 	str r5, [r6]
 
 	/* setup PB4 and PB5 for led 01 for bits 12-13 in MODER */
-	ldr r6, =GPIOA_MODER
+	ldr r6, =GPIOB_MODER
 	ldr r5, [r6]
 	/* cannot do with movs, so use pc relative */
 	ldr r4, =0xF00
@@ -151,7 +151,7 @@ main:
 	str r5, [r6]
 
 	/* turn on led connected to B4 and B5 in ODR */
-	ldr r6, =GPIOA_ODR
+	ldr r6, =GPIOB_ODR
 	ldr r5, [r6]
 	ldr r4,=0x30 /*B4 ve B5 e gelen pine 1 göndericem*/
 	orrs r5, r5, r4
