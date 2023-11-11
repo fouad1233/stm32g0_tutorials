@@ -117,7 +117,7 @@ main:
 	ldr r6, =RCC_IOPENR
 	ldr r5, [r6]
 	/* movs expects imm8, so this should be fine */
-	movs r4, 0x11
+	movs r4, 0x3
 	orrs r5, r5, r4 /*Enable GPIOA and GPIOB clock*/
 	str r5, [r6]/*Store the r5 register value to IOPENR register*/
 
@@ -125,10 +125,10 @@ main:
 	ldr r6, =GPIOA_MODER
 	ldr r5, [r6]
 	/* cannot do with movs, so use pc relative */
-	ldr r4, =0x03C00000
+	ldr r4, =0x3C00000/**/
 	mvns r4, r4
 	ands r5, r5, r4
-	ldr r4, =0x01400000
+	ldr r4, =0x1400000
 	orrs r5, r5, r4
 	str r5, [r6]
 
