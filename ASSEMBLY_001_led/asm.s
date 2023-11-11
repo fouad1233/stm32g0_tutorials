@@ -1,10 +1,9 @@
 /*
  * asm.s
  *
- * author: Furkan Cayci 
+ * author:Fouad Aladhami/Busra Ülker/Ayse Beril Cevik
  *
- * description: Added the necessary stuff for turning on the green LED on the 
- *   G031K8 Nucleo board. Mostly for teaching.
+ * description: Added the necessary stuff for turning on the 4 LEDs on the G031K8 Nucleo board.
  */
 
 
@@ -28,9 +27,9 @@
 .equ RCC_BASE,         (0x40021000)          // RCC base address
 .equ RCC_IOPENR,       (RCC_BASE   + (0x34)) // RCC IOPENR register offset
 
-.equ GPIOA_BASE,       (0x50000000)          // GPIOC base address?
-.equ GPIOA_MODER,      (GPIOA_BASE + (0x00)) // GPIOC MODER register offset
-.equ GPIOA_ODR,        (GPIOA_BASE + (0x14)) // GPIOC ODR register offset
+.equ GPIOA_BASE,       (0x50000000)          // GPIOA base address
+.equ GPIOA_MODER,      (GPIOA_BASE + (0x00)) // GPIOA MODER register offset
+.equ GPIOA_ODR,        (GPIOA_BASE + (0x14)) // GPIOA ODR register offset
 
 
 /* vector table, +1 thumb mode */
@@ -107,18 +106,16 @@ Default_Handler:
 /* main function */
 .section .text
 main:
-	/* enable GPIOA clock, bit2 on IOPENR (A pinlerinin clogunu aktif ettik)*/
+	/* enable GPIOA clock, bit0 on IOPENR */
 	ldr r6, =RCC_IOPENR
 	ldr r5, [r6]
-	/* movs expects imm8, so this should be fine */
 	movs r4, 0x1
 	orrs r5, r5, r4 /*Enable GPIOA clock*/
 	str r5, [r6]/*Store the r5 register value to IOPENR register*/
 
-	/* setup PA8 for led 01 for bits 12-13 in MODER(PA8'in modunu açtık) */
+	/* setup PA8 for led 01 for bits 12-13 in MODER*/
 	ldr r6, =GPIOA_MODER
 	ldr r5, [r6]
-	/* cannot do with movs, so use pc relative */
 	ldr r4, =0x30000
 	mvns r4, r4
 	ands r5, r5, r4
@@ -129,7 +126,7 @@ main:
 	/* turn on led connected to A8 in ODR */
 	ldr r6, =GPIOA_ODR
 	ldr r5, [r6]
-	ldr r4,=0x100 /*A8 e gelen pine 1 göndericem*/
+	ldr r4,=0x100
 	orrs r5, r5, r4
 	str r5, [r6]
 

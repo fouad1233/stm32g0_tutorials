@@ -1,10 +1,9 @@
 /*
  * asm.s
  *
- * author: Furkan Cayci 
+ * author:Fouad Aladhami/Büşra Ülker/Ayşe Beri Çevik
  *
- * description: Added the necessary stuff for turning on the green LED on the 
- *   G031K8 Nucleo board. Mostly for teaching.
+ * description: Added the necessary stuff for turning on the LED on the G031K8 Nucleo board.
  */
 
 
@@ -25,7 +24,7 @@
 
 
 /* define peripheral addresses from RM0444 page 57, Tables 3-4 */
-.equ RCC_BASE,         (0x40021000)          // RCC base address
+.equ RCC_BASE,         (0x40021000)          // RCC base address RCC(Reset and Clock Control)
 .equ RCC_IOPENR,       (RCC_BASE   + (0x34)) // RCC IOPENR register offset
 
 .equ GPIOA_BASE,       (0x50000000)          // GPIOA base address
@@ -113,10 +112,9 @@ Default_Handler:
 /* main function */
 .section .text
 main:
-	/* enable GPIOA and GPIOB clock, bit0 and bit1 on IOPENR (A pinlerinin clogunu aktif ettik)*/
+	/* enable GPIOA and GPIOB clock, bit0 and bit1 on IOPENR */
 	ldr r6, =RCC_IOPENR
 	ldr r5, [r6]
-	/* movs expects imm8, so this should be fine */
 	movs r4, 0x3
 	orrs r5, r5, r4 /*Enable GPIOA and GPIOB clock*/
 	str r5, [r6]/*Store the r5 register value to IOPENR register*/
@@ -124,8 +122,7 @@ main:
 	/* setup PA11 and PA12 for led 01 for bits 22-23 and 24-25 in MODER */
 	ldr r6, =GPIOA_MODER
 	ldr r5, [r6]
-	/* cannot do with movs, so use pc relative */
-	ldr r4, =0x3C00000/**/
+	ldr r4, =0x3C00000
 	mvns r4, r4
 	ands r5, r5, r4
 	ldr r4, =0x1400000
@@ -135,14 +132,13 @@ main:
 	/* turn on led connected to A11 and A12 in ODR */
 	ldr r6, =GPIOA_ODR
 	ldr r5, [r6]
-	ldr r4,=0x1800 /*A11 ve A12 e gelen pine 1 göndericem*/
+	ldr r4,=0x1800
 	orrs r5, r5, r4
 	str r5, [r6]
 
 	/* setup PB4 and PB5 for led 01 for bits 12-13 in MODER */
 	ldr r6, =GPIOB_MODER
 	ldr r5, [r6]
-	/* cannot do with movs, so use pc relative */
 	ldr r4, =0xF00
 	mvns r4, r4
 	ands r5, r5, r4
@@ -153,7 +149,7 @@ main:
 	/* turn on led connected to B4 and B5 in ODR */
 	ldr r6, =GPIOB_ODR
 	ldr r5, [r6]
-	ldr r4,=0x30 /*B4 ve B5 e gelen pine 1 göndericem*/
+	ldr r4,=0x30
 	orrs r5, r5, r4
 	str r5, [r6]
 
