@@ -32,34 +32,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := asm
+BUILD_ARTIFACT_NAME := ASSEMBLY_004_ledblink
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-asm.elf \
+ASSEMBLY_004_ledblink.elf \
 
 MAP_FILES += \
-asm.map \
+ASSEMBLY_004_ledblink.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-asm.list \
+ASSEMBLY_004_ledblink.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: asm.elf secondary-outputs
+main-build: ASSEMBLY_004_ledblink.elf secondary-outputs
 
 # Tool invocations
-asm.elf asm.map: $(OBJS) $(USER_OBJS) /Users/fuad/STM32CubeIDE/stm32g0-main/asm/stm32.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "asm.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"/Users/fuad/STM32CubeIDE/stm32g0-main/asm/stm32.ld" -Wl,-Map="asm.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+ASSEMBLY_004_ledblink.elf ASSEMBLY_004_ledblink.map: $(OBJS) $(USER_OBJS) /Users/fuad/STM32CubeIDE/stm32g0_tutorials/ASSEMBLY_004_ledblink/stm32.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "ASSEMBLY_004_ledblink.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"/Users/fuad/STM32CubeIDE/stm32g0_tutorials/ASSEMBLY_004_ledblink/stm32.ld" -Wl,-Map="ASSEMBLY_004_ledblink.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -68,14 +68,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-asm.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "asm.list"
+ASSEMBLY_004_ledblink.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "ASSEMBLY_004_ledblink.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) asm.elf asm.list asm.map default.size.stdout
+	-$(RM) ASSEMBLY_004_ledblink.elf ASSEMBLY_004_ledblink.list ASSEMBLY_004_ledblink.map default.size.stdout
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
