@@ -1,8 +1,9 @@
- /* asm.s
+/*
+ * asm.s
  *
  * author: Fouad Aladhami
  *
- * description:
+ *
  */
 
 
@@ -101,13 +102,26 @@ init_data:
 Default_Handler:
 	b Default_Handler
 
+rcc_gpio_clock_enable:
+	// Parameters: r0 = RCC_IOPENR base address, r1 = GPIO port
+	ldr r3, [r0] //Load the RCC_IOPENR value
+	//make a mask for the port
+	movs r4, #0x1
+	lsls r4, r4, r1
+	//set the port bit
+	orrs r3, r3, r4
+	//store the updated value back to the RCC_IOPENR register
+	str r3, [r0]
+	bx lr
+
+
 /* Function to initialize a GPIO pin */
 init_gpio:
   // Parameters: r0 = GPIO base address, r1 = pin number, r2 = mode
   ldr r3, [r0]      // Load the current GPIO MODER register value
   lsls r1, r1, #1   //Multiply pin number by 2 for shifting moder mode value
   lsls r2, r2, r1      // Shift the mode bits to the position of the pin
-  movs r4, #0x11 //define r4 mask
+  movs r4, #0x3 //define r4 mask
   lsls r4, r4, r1 //shift 0x11 mask to the pin register
   bics r3, r3, r4      // Clear the bits for this pin
   orrs r3, r3, r2      // Set the mode bits for this pin
@@ -117,11 +131,11 @@ init_gpio:
 /* Function to turn on an LED */
 turn_on_led:
   // Parameter: r0 = GPIO base address, r1 = pin number
-  ldr r2, [r0, #0x14]   // Load the ODR (output data register)
+  ldr r2, [r0,#0x14]   // Load the ODR (output data register)
   ldr r3, =#0x01
   lsls r3, r3, r1       // Create a bitmask for the pin
   orrs r2, r2, r3       // Set the pin to 1 (turn on the LED)
-  str r2, [r0, #0x14]   // Store the updated value back to the ODR register
+  str r2, [r0,#0x14]   // Store the updated value back to the ODR register
   bx lr
 
 /* Function to turn off an LED */
@@ -133,16 +147,17 @@ turn_off_led:
   bics r2, r2, r3       // Clear the pin to 0 (turn off the LED)
   str r2, [r0, #0x14]   // Store the updated value back to the ODR register
   bx lr
+
 /* main function */
 .section .text
 main:
-
-
+	ldr r0, =RCC_IOPENR
+	movs r1, #2 //set r1 to 2 for GPIOC
+	bl rcc_gpio_clock_enable //call the rcc_gpio_clock_enable function
 	ldr r0, =GPIOC_BASE   // Load the GPIO base address into r0
 	movs r1, #6            // Set r1 to the pin number (e.g., PC6)
 	movs r2, #1            // Set r2 to the mode (0 for general purpose output)
 	bl init_gpio           // Call the init_gpio function
-
 	ldr r0, =GPIOC_BASE     // Load the GPIO base address into r0
 	movs r1, #6            // Set r1 to the pin number (e.g., PC6)
 	bl turn_on_led         // Call the turn_on_led function
