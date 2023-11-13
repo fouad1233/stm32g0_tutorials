@@ -27,6 +27,15 @@
 .equ RCC_BASE,         (0x40021000)          // RCC base address
 .equ RCC_IOPENR,       (RCC_BASE   + (0x34)) // RCC IOPENR register offset
 
+.equ GPIOA_BASE,       (0x50000000)          // GPIOA base address
+.equ GPIOA_MODER,      (GPIOA_BASE + (0x00)) // GPIOA MODER register offset
+.equ GPIOA_ODR,        (GPIOA_BASE + (0x14)) // GPIOA ODR register offset
+
+
+.equ GPIOB_BASE,       (0x50000400)          // GPIOB base address
+.equ GPIOB_MODER,      (GPIOB_BASE + (0x00)) // GPIOB MODER register offset
+.equ GPIOB_ODR,        (GPIOB_BASE + (0x14)) // GPIOB ODR register offset
+
 .equ GPIOC_BASE,       (0x50000800)          // GPIOC base address
 .equ GPIOC_MODER,      (GPIOC_BASE + (0x00)) // GPIOC MODER register offset
 .equ GPIOC_ODR,        (GPIOC_BASE + (0x14)) // GPIOC ODR register offset
