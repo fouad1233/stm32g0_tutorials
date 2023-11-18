@@ -132,7 +132,7 @@ main:
   orrs r5, r5, r4 // write 01 to the bits
   str r5, [r6]
 
-  /* Set up PA1 for button the input mode(bits 0-1 in MODER)*/
+  /* Set up PA0 for button the input mode(bits 0-1 in MODER)*/
   ldr r6, =GPIOA_MODER
   ldr r5, [r6]
   ldr r4, =0x3
