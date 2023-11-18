@@ -159,7 +159,7 @@ delay_loop:
 	//load counter to r0 register
 	subs r0, r0, #1 //This took 1 cycle
     bne delay_loop // This took 3 cycle
-    b initstate
+    bx lr
 
 delay_loop1:
 	//load counter to r0 register
