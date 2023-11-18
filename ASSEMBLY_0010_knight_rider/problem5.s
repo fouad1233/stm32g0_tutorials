@@ -224,8 +224,8 @@ main:
 
 		ldr r5,=0x00000007 // assign led pattern to r5
 		ldr r4,=0x1
-		ldr r6,=0x0000E000
-		ldr r7,=0x00000007
+		ldr r6,=0x000000E0 //left limit
+		ldr r7,=0x00000007 //right limit
 	while_loop:
 	    cmp r5,r6
 	    bne left_shift
@@ -250,13 +250,3 @@ main:
 	str r5, [r1]
 	ldr r0, =DELAY_FREQ
 	b delay_loop2
-
-
-
-
-
-
-
-
-
-
