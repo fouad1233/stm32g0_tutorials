@@ -124,6 +124,11 @@ rcc_gpio_clock_enable:
 /* main function */
 .section .text
 main:
+	/*Enable GPIOB clock, bit 0 on IOPENR*/
+  	ldr r0, =RCC_IOPENR
+	movs r1, #0 //set r1 to 1 for GPIOA
+	bl rcc_gpio_clock_enable //call the rcc_gpio_clock_enable function
+
   	/*Enable GPIOB clock, bit 0 on IOPENR*/
   	ldr r0, =RCC_IOPENR
 	movs r1, #1 //set r1 to 1 for GPIOB
