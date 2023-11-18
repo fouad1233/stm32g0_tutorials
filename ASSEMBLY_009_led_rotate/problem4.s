@@ -38,7 +38,7 @@
 .equ GPIOA_ODR,        (GPIOA_BASE + (0x14)) // GPIOA ODR register offset
 .equ GPIOA_IDR,        (GPIOA_BASE + (0x10)) // GPIOA IDR register offset
 
-.equ DELAY_FREQ,		(16000000/30)
+.equ DELAY_FREQ,		(16000000/190)
 
 
 /* vector table, +1 thumb mode */
@@ -160,25 +160,38 @@ delay_loop:
 
 	button_control:
 		/*Control button*/
-	  	ldr r2,=GPIOA_IDR
-	  	ldr r1,[r2]
-	  	movs r3,#1 /*r4=0001*/
-	  	ands r1,r1,r3/*if PA0 is 1, r5 is 1*/
-	  	cmp r1,#0x1
+	  	ldr r2,=GPIOA_IDR //2 cycle
+	  	ldr r1,[r2]	//2 cycle
+	  	movs r3,#1 /*r4=0001*/ //1cycle
+	  	ands r1,r1,r3/*if PA0 is 1, r5 is 1*/ //1cycle
+		movs r7,r1 //1cycle
+		movs r3,0 //1cycle
+		mvns r3,r6 //1cycle
+		ands r3, r7 //1cycle
+	  	bne change_pattern //1cycle if condition not-taken
+	  	beq do_nothing//3 cycle if condition tken
 
-	  	beq set_shift_right_pattern
-	  	bne set_shift_left_pattern
-
-		set_shift_right_pattern:
-			movs r4, #31
+		do_nothing:
+			movs r6,r7	//this took 1 cycle
 			subs r0, r0, #1 //This took 1 cycle
 			bne delay_loop // This took 3 cycle
 			bx lr
-		set_shift_left_pattern:
-			movs r4, #1
-			subs r0, r0, #1 //This took 1 cycle
-			bne delay_loop // This took 3 cycle
-			bx lr
+
+		change_pattern:
+			movs r6,r7
+			cmp r4,#1
+			beq set_shift_right_pattern
+			bne set_shift_left_pattern
+			set_shift_right_pattern:
+				movs r4, #31
+				b pattern_changed
+			set_shift_left_pattern:
+				movs r4,#1
+			pattern_changed:
+				subs r0, r0, #1 //This took 1 cycle
+				bne delay_loop // This took 3 cycle
+				bx lr
+
 
 
 
@@ -209,6 +222,7 @@ main:
   	bl init_gpio
 
 	movs r6,#0
+	movs r7,#0
 	initstate:
 		ldr r0, =GPIOB_BASE
 		movs r1, #0 //0 for pin 0
