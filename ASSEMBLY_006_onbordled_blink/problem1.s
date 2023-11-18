@@ -1,7 +1,7 @@
 /*
  * asm.s
  *
- * author: Fouad Aladhami/Büşra Ülker/Ayşe Beri Çevik
+ * author: Furkan Cayci
  *
  * description: Added the necessary stuff for turning on the green LED on the 
  *   G031K8 Nucleo board. Mostly for teaching.
@@ -28,11 +28,9 @@
 .equ RCC_BASE,         (0x40021000)          // RCC base address
 .equ RCC_IOPENR,       (RCC_BASE   + (0x34)) // RCC IOPENR register offset
 
-
-.equ GPIOC_BASE,       (0x50000800)          // GPIOA base address?
-.equ GPIOC_MODER,      (GPIOC_BASE + (0x00)) // GPIOA MODER register offset
-.equ GPIOC_ODR,        (GPIOC_BASE + (0x14)) // GPIOA ODR register offset
-
+.equ GPIOC_BASE,       (0x50000800)          // GPIOC base address
+.equ GPIOC_MODER,      (GPIOC_BASE + (0x00)) // GPIOC MODER register offset
+.equ GPIOC_ODR,        (GPIOC_BASE + (0x14)) // GPIOC ODR register offset
 .equ DELAY_FREQ,		(16000000/3)
 
 /* vector table, +1 thumb mode */
@@ -110,7 +108,7 @@ Default_Handler:
 .section .text
 
 main:
-  /*Enable GPIOC clock, bit 3 on IOPENR*/
+  /*Enable GPIOC clock, bit 2 on IOPENR*/
   ldr r6, =RCC_IOPENR
   ldr r5, [r6]
   movs r4, 0x4
@@ -121,9 +119,10 @@ main:
   ldr r6, =GPIOC_MODER
   ldr r5, [r6]
   ldr r4, =0x3000
-  bics r5, r5, r4 //erase bits 16 and 17
+  mvns r4, r4
+  ands r5, r5, r4
   ldr r4, =0x1000
-  orrs r5, r5, r4 // write 01 to the bits
+  orrs r5, r5, r4
   str r5, [r6]
 
   /* Blink the LED*/
@@ -131,15 +130,15 @@ main:
   	ldr r6, =GPIOC_ODR
     /*Read the current state of the LED*/
     ldr r5, [r6]
-    /*Set r4 to the value 0x100 (bit 8)*/
-    ldr r4, =0x40
-    //Toggle the LED state by XORing with 0x100
+    /*Set r4 to the value 0x40 (bit 6)*/
+    movs r4, 0x40
+    //Toggle the LED state by XORing with 0x40
     eors r5, r5, r4
    	// Update the LED state
     str r5, [r6]
 
     // Delay between LED state changes (adjust for desired speed)
-    ldr r0, =DELAY_FREQ
+    ldr r0, =DELAY_FREQ  //4_000_000*4 = 16_000_000 cycle it will blink in 1 second
     delay_loop:
       subs r0, r0, #1 //This took 1 cycle
       bne delay_loop // This took 3 cycle
