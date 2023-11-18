@@ -1,10 +1,10 @@
 /*
  * asm.s
  *
- * author: Fouad Aladhami/Büşra Ülker/Ayşe Beri Çevik
+ * author: Fouad Aladhami/Büşra Ülker/Ayşe Beril Cevik
  *
- * description: Added the necessary stuff for turning on the green LED on the 
- *   G031K8 Nucleo board. Mostly for teaching.
+ * description: Added the necessary stuff for turning on the LED on the
+ *   G031K8 Nucleo board with button. Mostly for teaching.
  */
 
 
@@ -29,7 +29,7 @@
 .equ RCC_IOPENR,       (RCC_BASE   + (0x34)) // RCC IOPENR register offset
 
 
-.equ GPIOA_BASE,       (0x50000000)          // GPIOA base address?
+.equ GPIOA_BASE,       (0x50000000)          // GPIOA base address
 .equ GPIOA_MODER,      (GPIOA_BASE + (0x00)) // GPIOA MODER register offset
 .equ GPIOA_ODR,        (GPIOA_BASE + (0x14)) // GPIOA ODR register offset
 .equ GPIOA_IDR,        (GPIOA_BASE + (0x10)) // GPIOA IDR register offset
@@ -119,20 +119,20 @@ main:
   /*Enable GPIOA/C clock, bit 0 and 2 on IOPENR*/
   ldr r6, =RCC_IOPENR
   ldr r5, [r6]
-  movs r4, 0x5
-  orrs r5, r5, r4
+  movs r4, 0x5//r4=0101
+  orrs r5, r5, r4//set 1 bit 0 and 2
   str r5, [r6]
 
   /* Set up PC6 for the LED (bits 12-13 in MODER)*/
   ldr r6, =GPIOC_MODER
   ldr r5, [r6]
   ldr r4, =0x3000
-  bics r5, r5, r4 //erase bits 16 and 17
+  bics r5, r5, r4 //erase bits 12 and 13
   ldr r4, =0x1000
   orrs r5, r5, r4 // write 01 to the bits
   str r5, [r6]
 
-  /* Set up PA0 for button the input mode(bits 0-1 in MODER)*/
+  /* Set up PA0 for button the input mode(00)(bits 0-1 in MODER)*/
   ldr r6, =GPIOA_MODER
   ldr r5, [r6]
   ldr r4, =0x3
@@ -141,34 +141,31 @@ main:
 
   buttoncontrol:
   /*Control button*/
-  ldr r6,=GPIOA_IDR
+  ldr r6,=GPIOA_IDR//read button
   ldr r5,[r6]
   movs r4,#1 /*r4=0001*/
   ands r5,r5,r4/*if PA0 is 1, r5 is 1*/
 
-  cmp r5,#0x1
-  beq led_on
-  bne led_off
+  cmp r5,#0x1//Is the button 1?
+  beq led_on//Yes.Led on.
+  bne led_off//No.Led off.
 
 
   led_on:
   ldr r6, =GPIOC_ODR
   ldr r5, [r6]
   movs r4,#0x40
-  orrs r5, r5, r4
+  orrs r5, r5, r4//set pin 6
   str r5, [r6]
-  b buttoncontrol
+  b buttoncontrol//control button again
 
   led_off:
   ldr r6, =GPIOC_ODR
   ldr r5, [r6]
   movs r4,#0x40
-  bics r5, r5, r4
+  bics r5, r5, r4//clear pin 6
   str r5, [r6]
-  b buttoncontrol
+  b buttoncontrol//control button again
 
-
-
-  nop
 
 

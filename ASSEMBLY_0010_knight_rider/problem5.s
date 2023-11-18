@@ -3,8 +3,8 @@
  *
  * author: Fouad Aladhami/Büşra Ülker/Ayşe Beri Çevik
  *
- * description: Added the necessary stuff for turning on the green LED on the 
- *   G031K8 Nucleo board. Mostly for teaching.
+ * description: Added the necessary stuff for turning on  LEDS with
+ *   G031K8 Nucleo board.
  */
 
 
@@ -33,10 +33,6 @@
 .equ GPIOB_MODER,      (GPIOB_BASE + (0x00)) // GPIOB MODER register offset
 .equ GPIOB_ODR,        (GPIOB_BASE + (0x14)) // GPIOB ODR register offset
 
-.equ GPIOA_BASE,       (0x50000000)          // GPIOA base address?
-.equ GPIOA_MODER,      (GPIOA_BASE + (0x00)) // GPIOA MODER register offset
-.equ GPIOA_ODR,        (GPIOA_BASE + (0x14)) // GPIOA ODR register offset
-.equ GPIOA_IDR,        (GPIOA_BASE + (0x10)) // GPIOA IDR register offset
 
 .equ DELAY_FREQ,		(16000000/30)
 
@@ -195,10 +191,7 @@ main:
   	orrs r5, r5, r4 // write 01 to the bits
   	str r5, [r6]
 
-  	ldr r0, =GPIOA_MODER
-  	movs r1, #0 //0 for active pin 0
-  	movs r2, #0 //0 for input mode
-  	bl init_gpio
+
 
 	initstate:
 		ldr r0, =GPIOB_BASE
@@ -226,7 +219,6 @@ main:
 		ldr r4,=0x1
 		ldr r6,=0x000000E0 //left limit
 		ldr r7,=0x00000007 //right limit
-
 
 
 	left_shift:
