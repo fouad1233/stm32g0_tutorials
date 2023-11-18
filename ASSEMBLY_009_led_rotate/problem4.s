@@ -157,26 +157,28 @@ rcc_gpio_clock_enable:
 
 delay_loop:
 	//load counter to r0 register
-	subs r0, r0, #1 //This took 1 cycle
 
-	/*Control button*/
-  	ldr r2,=GPIOA_IDR
-  	ldr r1,[r2]
-  	movs r3,#1 /*r4=0001*/
-  	ands r1,r1,r3/*if PA0 is 1, r5 is 1*/
-  	cmp r1,#0x1
+	button_control:
+		/*Control button*/
+	  	ldr r2,=GPIOA_IDR
+	  	ldr r1,[r2]
+	  	movs r3,#1 /*r4=0001*/
+	  	ands r1,r1,r3/*if PA0 is 1, r5 is 1*/
+	  	cmp r1,#0x1
 
-  	beq set_shift_right_pattern
-  	bne set_shift_left_pattern
+	  	beq set_shift_right_pattern
+	  	bne set_shift_left_pattern
 
-	set_shift_right_pattern:
-		movs r4, #31
-		bne delay_loop // This took 3 cycle
-		bx lr
-	set_shift_left_pattern:
-		movs r4, #1
-		bne delay_loop // This took 3 cycle
-		bx lr
+		set_shift_right_pattern:
+			movs r4, #31
+			subs r0, r0, #1 //This took 1 cycle
+			bne delay_loop // This took 3 cycle
+			bx lr
+		set_shift_left_pattern:
+			movs r4, #1
+			subs r0, r0, #1 //This took 1 cycle
+			bne delay_loop // This took 3 cycle
+			bx lr
 
 
 
@@ -206,6 +208,7 @@ main:
   	movs r2, #0 //0 for input mode
   	bl init_gpio
 
+	movs r6,#0
 	initstate:
 		ldr r0, =GPIOB_BASE
 		movs r1, #0 //0 for pin 0
