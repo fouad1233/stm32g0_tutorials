@@ -223,7 +223,7 @@ main:
 		bl delay_loop
 
 		ldr r5,=0x00000007 // assign led pattern to r5
-		r4=0x1
+		ldr r4,=0x1
 		ldr r6,=0x0000E000
 		ldr r7,=0x00000007
 	while_loop:
