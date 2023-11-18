@@ -194,25 +194,26 @@ main:
 
 
 	initstate:
+	/*İnitial codes for the first 3 LEDs of the system to light up*/
 		ldr r0, =GPIOB_BASE
 		movs r1, #0 //0 for pin 0
 		bl turn_on_led
 
-		ldr r0, =DELAY_FREQ
+		ldr r0, =DELAY_FREQ//for 100 ms delay
 		bl delay_loop
 
 		ldr r0, =GPIOB_BASE
 		movs r1, #1 //1 for pin 1
 		bl turn_on_led
 
-		ldr r0, =DELAY_FREQ
+		ldr r0, =DELAY_FREQ//for 100 ms delay
 		bl delay_loop
 
 		ldr r0, =GPIOB_BASE
 		movs r1, #2 //2 for pin 2
 		bl turn_on_led
 
-		ldr r0, =DELAY_FREQ
+		ldr r0, =DELAY_FREQ//for 100 ms delay
 		bl delay_loop
 
 		ldr r5,=0x00000007 // assign led pattern to r5
@@ -222,20 +223,20 @@ main:
 
 
 	left_shift:
-	cmp r5,r6
-	beq right_shift
-	lsls r5,r5,r4
+	cmp r5,r6//It is checked whether it reaches the leftmost bit or not.
+	beq right_shift//Shift right if on the leftmost bit
+	lsls r5,r5,r4//shift left 1 bit
 	ldr r1, =GPIOB_ODR
-	str r5, [r1]
-	ldr r0, =DELAY_FREQ
+	str r5, [r1]//Write ODR
+	ldr r0, =DELAY_FREQ//for 100ms delay
 	b delay_loop1
 
 
 	right_shift:
-	cmp r5,r7
-	beq left_shift
-	lsrs r5,r5,r4
+	cmp r5,r7//It is checked whether it reaches the rightmost bit or not.
+	beq left_shift//Shift left if on the rightmost bit
+	lsrs r5,r5,r4//shift right 1 bit
 	ldr r1, =GPIOB_ODR
-	str r5, [r1]
-	ldr r0, =DELAY_FREQ
+	str r5, [r1]//Write ODR
+	ldr r0, =DELAY_FREQ//for 100 ms delay
 	b delay_loop2
