@@ -146,7 +146,7 @@ main:
   movs r4,#1 /*r4=0001*/
   ands r5,r5,r4/*if PA0 is 1, r5 is 1*/
 
-  comp r5,0x1
+  cmp r5,#0x1
   beq led_on
   bne led_off
 
@@ -154,7 +154,7 @@ main:
   led_on:
   ldr r6, =GPIOC_ODR
   ldr r5, [r6]
-  movs r4,=0x40
+  movs r4,#0x40
   orrs r5, r5, r4
   str r5, [r6]
   b buttoncontrol
@@ -162,7 +162,7 @@ main:
   led_off:
   ldr r6, =GPIOC_ODR
   ldr r5, [r6]
-  movs r4,=0x40
+  movs r4,#0x40
   bics r5, r5, r4
   str r5, [r6]
   b buttoncontrol
