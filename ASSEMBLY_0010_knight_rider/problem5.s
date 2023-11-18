@@ -159,8 +159,19 @@ delay_loop:
 	//load counter to r0 register
 	subs r0, r0, #1 //This took 1 cycle
     bne delay_loop // This took 3 cycle
-    b while_loop
+    b initstate
 
+delay_loop1:
+	//load counter to r0 register
+	subs r0, r0, #1 //This took 1 cycle
+    bne delay_loop1 // This took 3 cycle
+    b left_shift
+
+delay_loop2:
+	//load counter to r0 register
+	subs r0, r0, #1 //This took 1 cycle
+    bne delay_loop2 // This took 3 cycle
+    b right_shift
 
 
 /* main function */
@@ -213,41 +224,34 @@ main:
 
 		ldr r5,=0x00000007 // assign led pattern to r5
 		r4=0x1
-		ldr r6,=0x0
-		ldr r7,=0x0
+		ldr r6,=0x0000E000
+		ldr r7,=0x00000007
 	while_loop:
-	    cmp r6,#0x1
+	    cmp r5,r6
 	    bne left_shift
 	    beq right_shift
 
 
 	left_shift:
+	cmp r5,r6
+	beq right_shift
 	lsls r5,r5,r4
 	ldr r1, =GPIOB_ODR
 	str r5, [r1]
-	adds r7,r7,r4
-	cmp r7,#0x5
-	beq change1
 	ldr r0, =DELAY_FREQ
-	b delay_loop
+	b delay_loop1
 
 
 	right_shift:
+	cmp r5,r7
+	beq left_shift
 	lsrs r5,r5,r4
 	ldr r1, =GPIOB_ODR
 	str r5, [r1]
-	adds r7,r7,r4
-	cmp r7,#0x5
-	beq change2
 	ldr r0, =DELAY_FREQ
-	b delay_loop
-
-    change1:
-    ldr r6,=0x1
+	b delay_loop2
 
 
-    change2:
-    ldr r6,=0x0
 
 
 
