@@ -226,10 +226,7 @@ main:
 		ldr r4,=0x1
 		ldr r6,=0x000000E0 //left limit
 		ldr r7,=0x00000007 //right limit
-	while_loop:
-	    cmp r5,r6
-	    bne left_shift
-	    beq right_shift
+
 
 
 	left_shift:
