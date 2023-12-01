@@ -59,6 +59,9 @@
 .equ D7_GPIO_PIN_NUMBER , 2
 .equ D8_GPIO_PORT_ADRESS , GPIOB_BASE
 .equ D8_GPIO_PIN_NUMBER , 8
+.equ D9_GPIO_PORT_ADRESS , GPIOA_BASE
+.equ D9_GPIO_PIN_NUMBER , 8
+.equ D10_GPIO_PORT_ADRESS , GPIOA_BASE
 
 
 /* vector table, +1 thumb mode */
