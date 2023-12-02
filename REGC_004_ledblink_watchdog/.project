@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>REGC_001_ledblink_systick</name>
+	<name>REGC_004_ledblink_watchdog</name>
 	<comment></comment>
 	<projects>
 	</projects>
