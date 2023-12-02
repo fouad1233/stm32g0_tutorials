@@ -10,31 +10,42 @@ uint8_t seconds;
 
 
 //functions prototypes
-void delay(volatile uint32_t);
-void Init_Systick(uint32_t tick);
-void Systick_Handler(void);
-void increase_tick(void);
-uint64_t getTick(void);
-void delay_ms(uint64_t msvalue);
-
 void GPIOC_RCC_Init(void);
 void GPIOC_Init(void);
 void toggle_led(void);
+
+void TIM2_Clock_Init(void);
+void TIM2_Interrupt_Config(void);
+void TIM2_IRQHandler(void);
+void Start_TIM2(void);
+void Stop_TIM2(void);
 
 
 int main(void) {
 
 	//init
-	Init_Systick(16000);
 	GPIOC_RCC_Init();
 	GPIOC_Init();
+	TIM2_Clock_Init();
+	TIM2_Interrupt_Config();
+	Start_TIM2();
 
 	while(1) {
-        delay_ms(1000);
-        seconds ++;
+
     }
 
     return 0;
+}
+
+void TIM2_IRQHandler(void) {
+    if (TIM2->SR & TIM_SR_UIF) {
+        //Code here
+    	seconds++;
+    	toggle_led();
+
+        // Clear the interrupt flag
+        TIM2->SR &= ~TIM_SR_UIF;
+    }
 }
 void GPIOC_RCC_Init(void){
 	 /* Enable GPIOC clock */
@@ -47,23 +58,28 @@ void GPIOC_Init(void){
 void toggle_led(void){
 	GPIOC->ODR ^= (1U << 6);
 }
+void TIM2_Clock_Init(void){
+	// Enable TIM2 clock
+	RCC->APBENR1 |= RCC_APBENR1_TIM2EN;
 
-void increase_tick(void){
-	tick++;
+	// Set TIM2 prescaler and period
+	TIM2->PSC = 15999;
+	TIM2->ARR = 999;
+}
+void TIM2_Interrupt_Config(void){
+	NVIC_SetPriority(TIM2_IRQn, 15);
+	NVIC_EnableIRQ(TIM2_IRQn);
+	//Update interrupt enable
+	TIM2->DIER |= TIM_DIER_UIE;
+}
 
+void Start_TIM2(void){
+	// Start TIM2
+	TIM2->CR1 |= TIM_CR1_CEN;
 }
-void Init_Systick(uint32_t tick){
-	SysTick->LOAD = tick; // Count down from 999 to 0
-	SysTick->VAL  = 0;   // Clear current value
-	SysTick->CTRL = 0x7; // Enable Systick, exception,and use processor clock
+void Stop_TIM2(void){
+	// Stop TIM2
+	TIM2->CR1 &= ~TIM_CR1_CEN;
 }
-uint64_t getTick(void){
-	return tick;
-}
-void delay_ms(uint64_t msvalue){
-	uint64_t startTick =getTick() ;
-	while ((getTick() - startTick) < msvalue)
-	  {
-	  }
-}
+
 
