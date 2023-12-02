@@ -1,7 +1,6 @@
 #include "stm32g0xx.h"
 #include "stm32g031xx.h"
 
-#define LEDDELAY    1600000
 
 //variables
 uint64_t tick;
