@@ -1,0 +1,415 @@
+
+ASSEMBLY_0010_knight_rider.elf:     file format elf32-littlearm
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000148  08000000  08000000  00010000  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .init         00000004  08000148  08000148  00010148  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .fini         00000004  0800014c  0800014c  0001014c  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  3 .data         00000000  20000000  20000000  00010150  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  4 .bss          00000000  20000000  20000000  00000000  2**0
+                  ALLOC
+  5 .ARM.attributes 00000028  00000000  00000000  00010150  2**0
+                  CONTENTS, READONLY
+  6 .debug_line   000000c8  00000000  00000000  00010178  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+  7 .debug_info   00000026  00000000  00000000  00010240  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+  8 .debug_abbrev 00000014  00000000  00000000  00010266  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+  9 .debug_aranges 00000020  00000000  00000000  00010280  2**3
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 10 .debug_str    00000071  00000000  00000000  000102a0  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+
+Disassembly of section .text:
+
+08000000 <vector_table>:
+ 8000000:	20002000 	.word	0x20002000
+ 8000004:	08000021 	.word	0x08000021
+ 8000008:	08000057 	.word	0x08000057
+ 800000c:	08000057 	.word	0x08000057
+ 8000010:	20000000 	.word	0x20000000
+ 8000014:	20000000 	.word	0x20000000
+ 8000018:	20000000 	.word	0x20000000
+ 800001c:	20000000 	.word	0x20000000
+
+08000020 <Reset_Handler>:
+
+/* reset handler */
+.section .text
+Reset_Handler:
+	/* set stack pointer */
+	ldr r0, =_estack
+ 8000020:	483a      	ldr	r0, [pc, #232]	; (800010c <right_shift+0xe>)
+	mov sp, r0
+ 8000022:	4685      	mov	sp, r0
+
+	/* initialize data and bss 
+	 * not necessary for rom only code 
+	 * */
+	bl init_data
+ 8000024:	f000 f803 	bl	800002e <init_data>
+	/* call main */
+	bl main
+ 8000028:	f000 f83a 	bl	80000a0 <main>
+	/* trap if returned */
+	b .
+ 800002c:	e7fe      	b.n	800002c <Reset_Handler+0xc>
+
+0800002e <init_data>:
+/* initialize data and bss sections */
+.section .text
+init_data:
+
+	/* copy rom to ram */
+	ldr r0, =_sdata
+ 800002e:	4838      	ldr	r0, [pc, #224]	; (8000110 <right_shift+0x12>)
+	ldr r1, =_edata
+ 8000030:	4938      	ldr	r1, [pc, #224]	; (8000114 <right_shift+0x16>)
+	ldr r2, =_sidata
+ 8000032:	4a39      	ldr	r2, [pc, #228]	; (8000118 <right_shift+0x1a>)
+	movs r3, #0
+ 8000034:	2300      	movs	r3, #0
+	b LoopCopyDataInit
+ 8000036:	e002      	b.n	800003e <LoopCopyDataInit>
+
+08000038 <CopyDataInit>:
+
+	CopyDataInit:
+		ldr r4, [r2, r3]
+ 8000038:	58d4      	ldr	r4, [r2, r3]
+		str r4, [r0, r3]
+ 800003a:	50c4      	str	r4, [r0, r3]
+		adds r3, r3, #4
+ 800003c:	3304      	adds	r3, #4
+
+0800003e <LoopCopyDataInit>:
+
+	LoopCopyDataInit:
+		adds r4, r0, r3
+ 800003e:	18c4      	adds	r4, r0, r3
+		cmp r4, r1
+ 8000040:	428c      	cmp	r4, r1
+		bcc CopyDataInit
+ 8000042:	d3f9      	bcc.n	8000038 <CopyDataInit>
+
+	/* zero bss */
+	ldr r2, =_sbss
+ 8000044:	4a35      	ldr	r2, [pc, #212]	; (800011c <right_shift+0x1e>)
+	ldr r4, =_ebss
+ 8000046:	4c36      	ldr	r4, [pc, #216]	; (8000120 <right_shift+0x22>)
+	movs r3, #0
+ 8000048:	2300      	movs	r3, #0
+	b LoopFillZerobss
+ 800004a:	e001      	b.n	8000050 <LoopFillZerobss>
+
+0800004c <FillZerobss>:
+
+	FillZerobss:
+		str  r3, [r2]
+ 800004c:	6013      	str	r3, [r2, #0]
+		adds r2, r2, #4
+ 800004e:	3204      	adds	r2, #4
+
+08000050 <LoopFillZerobss>:
+
+	LoopFillZerobss:
+		cmp r2, r4
+ 8000050:	42a2      	cmp	r2, r4
+		bcc FillZerobss
+ 8000052:	d3fb      	bcc.n	800004c <FillZerobss>
+
+	bx lr
+ 8000054:	4770      	bx	lr
+
+08000056 <Default_Handler>:
+
+
+/* default handler */
+.section .text
+Default_Handler:
+	b Default_Handler
+ 8000056:	e7fe      	b.n	8000056 <Default_Handler>
+
+08000058 <init_gpio>:
+
+/* Function to initialize a GPIO pin */
+init_gpio:
+  // Parameters: r0 = GPIO base address, r1 = pin number, r2 = mode
+  ldr r3, [r0]      // Load the current GPIO MODER register value
+ 8000058:	6803      	ldr	r3, [r0, #0]
+  lsls r1, r1, #1   //Multiply pin number by 2 for shifting moder mode value
+ 800005a:	0049      	lsls	r1, r1, #1
+  lsls r2, r2, r1      // Shift the mode bits to the position of the pin
+ 800005c:	408a      	lsls	r2, r1
+  movs r4, #0x3 //define r4 mask
+ 800005e:	2403      	movs	r4, #3
+  lsls r4, r4, r1 //shift 0x11 mask to the pin register
+ 8000060:	408c      	lsls	r4, r1
+  bics r3, r3, r4      // Clear the bits for this pin
+ 8000062:	43a3      	bics	r3, r4
+  orrs r3, r3, r2      // Set the mode bits for this pin
+ 8000064:	4313      	orrs	r3, r2
+  str r3, [r0]      // Store the updated value back to the MODER register
+ 8000066:	6003      	str	r3, [r0, #0]
+  bx lr
+ 8000068:	4770      	bx	lr
+
+0800006a <turn_on_led>:
+/* Function to turn on an LED */
+turn_on_led:
+  // Parameter: r0 = GPIO base address, r1 = pin number
+  ldr r2, [r0,#0x14]   // Load the ODR (output data register)
+ 800006a:	6942      	ldr	r2, [r0, #20]
+  ldr r3, =#0x01
+ 800006c:	4b2d      	ldr	r3, [pc, #180]	; (8000124 <right_shift+0x26>)
+  lsls r3, r3, r1       // Create a bitmask for the pin
+ 800006e:	408b      	lsls	r3, r1
+  orrs r2, r2, r3       // Set the pin to 1 (turn on the LED)
+ 8000070:	431a      	orrs	r2, r3
+  str r2, [r0,#0x14]   // Store the updated value back to the ODR register
+ 8000072:	6142      	str	r2, [r0, #20]
+  bx lr
+ 8000074:	4770      	bx	lr
+
+08000076 <turn_off_led>:
+
+/* Function to turn off an LED */
+turn_off_led:
+  // Parameter: r0 = GPIO base address, r1 = pin number
+  ldr r2, [r0, #0x14]   // Load the ODR (output data register)
+ 8000076:	6942      	ldr	r2, [r0, #20]
+  ldr r3, =#0x01
+ 8000078:	4b2a      	ldr	r3, [pc, #168]	; (8000124 <right_shift+0x26>)
+  lsls r3, r3, r1      // Create a bitmask for the pin
+ 800007a:	408b      	lsls	r3, r1
+  bics r2, r2, r3       // Clear the pin to 0 (turn off the LED)
+ 800007c:	439a      	bics	r2, r3
+  str r2, [r0, #0x14]   // Store the updated value back to the ODR register
+ 800007e:	6142      	str	r2, [r0, #20]
+  bx lr
+ 8000080:	4770      	bx	lr
+
+08000082 <rcc_gpio_clock_enable>:
+
+rcc_gpio_clock_enable:
+	// Parameters: r0 = RCC_IOPENR base address, r1 = GPIO port
+	ldr r3, [r0] //Load the RCC_IOPENR value
+ 8000082:	6803      	ldr	r3, [r0, #0]
+	//make a mask for the port
+	movs r4, #0x1
+ 8000084:	2401      	movs	r4, #1
+	lsls r4, r4, r1
+ 8000086:	408c      	lsls	r4, r1
+	//set the port bit
+	orrs r3, r3, r4
+ 8000088:	4323      	orrs	r3, r4
+	//store the updated value back to the RCC_IOPENR register
+	str r3, [r0]
+ 800008a:	6003      	str	r3, [r0, #0]
+	bx lr
+ 800008c:	4770      	bx	lr
+
+0800008e <delay_loop>:
+
+delay_loop:
+	//load counter to r0 register
+	subs r0, r0, #1 //This took 1 cycle
+ 800008e:	3801      	subs	r0, #1
+    bne delay_loop // This took 3 cycle
+ 8000090:	d1fd      	bne.n	800008e <delay_loop>
+    bx lr
+ 8000092:	4770      	bx	lr
+
+08000094 <delay_loop1>:
+
+delay_loop1:
+	//load counter to r0 register
+	subs r0, r0, #1 //This took 1 cycle
+ 8000094:	3801      	subs	r0, #1
+    bne delay_loop1 // This took 3 cycle
+ 8000096:	d1fd      	bne.n	8000094 <delay_loop1>
+    b left_shift
+ 8000098:	e02a      	b.n	80000f0 <left_shift>
+
+0800009a <delay_loop2>:
+
+delay_loop2:
+	//load counter to r0 register
+	subs r0, r0, #1 //This took 1 cycle
+ 800009a:	3801      	subs	r0, #1
+    bne delay_loop2 // This took 3 cycle
+ 800009c:	d1fd      	bne.n	800009a <delay_loop2>
+    b right_shift
+ 800009e:	e02e      	b.n	80000fe <right_shift>
+
+080000a0 <main>:
+
+/* main function */
+.section .text
+main:
+  	/*Enable GPIOA clock, bit 0 on IOPENR*/
+  	ldr r0, =RCC_IOPENR
+ 80000a0:	4821      	ldr	r0, [pc, #132]	; (8000128 <right_shift+0x2a>)
+	movs r1, #0 //set r1 to 1 for GPIOA
+ 80000a2:	2100      	movs	r1, #0
+	bl rcc_gpio_clock_enable //call the rcc_gpio_clock_enable function
+ 80000a4:	f7ff ffed 	bl	8000082 <rcc_gpio_clock_enable>
+	/*Enable GPIOB clock, bit 1 on IOPENR*/
+  	ldr r0, =RCC_IOPENR
+ 80000a8:	481f      	ldr	r0, [pc, #124]	; (8000128 <right_shift+0x2a>)
+	movs r1, #1 //set r1 to 1 for GPIOB
+ 80000aa:	2101      	movs	r1, #1
+	bl rcc_gpio_clock_enable //call the rcc_gpio_clock_enable function
+ 80000ac:	f7ff ffe9 	bl	8000082 <rcc_gpio_clock_enable>
+
+  	/* Set up PB0- PB7 for the LED (bits 16-17 in MODER)*/
+  	ldr r6, =GPIOB_MODER
+ 80000b0:	4e1e      	ldr	r6, [pc, #120]	; (800012c <right_shift+0x2e>)
+  	ldr r5, [r6]
+ 80000b2:	6835      	ldr	r5, [r6, #0]
+  	ldr r4, =0xFFFF
+ 80000b4:	4c1e      	ldr	r4, [pc, #120]	; (8000130 <right_shift+0x32>)
+  	bics r5, r5, r4 //erase bits 16 and 17
+ 80000b6:	43a5      	bics	r5, r4
+  	ldr r4, =0x5555
+ 80000b8:	4c1e      	ldr	r4, [pc, #120]	; (8000134 <right_shift+0x36>)
+  	orrs r5, r5, r4 // write 01 to the bits
+ 80000ba:	4325      	orrs	r5, r4
+  	str r5, [r6]
+ 80000bc:	6035      	str	r5, [r6, #0]
+
+080000be <initstate>:
+
+
+
+	initstate:
+		ldr r0, =GPIOB_BASE
+ 80000be:	481b      	ldr	r0, [pc, #108]	; (800012c <right_shift+0x2e>)
+		movs r1, #0 //0 for pin 0
+ 80000c0:	2100      	movs	r1, #0
+		bl turn_on_led
+ 80000c2:	f7ff ffd2 	bl	800006a <turn_on_led>
+
+		ldr r0, =DELAY_FREQ
+ 80000c6:	481c      	ldr	r0, [pc, #112]	; (8000138 <right_shift+0x3a>)
+		bl delay_loop
+ 80000c8:	f7ff ffe1 	bl	800008e <delay_loop>
+
+		ldr r0, =GPIOB_BASE
+ 80000cc:	4817      	ldr	r0, [pc, #92]	; (800012c <right_shift+0x2e>)
+		movs r1, #1 //1 for pin 1
+ 80000ce:	2101      	movs	r1, #1
+		bl turn_on_led
+ 80000d0:	f7ff ffcb 	bl	800006a <turn_on_led>
+
+		ldr r0, =DELAY_FREQ
+ 80000d4:	4818      	ldr	r0, [pc, #96]	; (8000138 <right_shift+0x3a>)
+		bl delay_loop
+ 80000d6:	f7ff ffda 	bl	800008e <delay_loop>
+
+		ldr r0, =GPIOB_BASE
+ 80000da:	4814      	ldr	r0, [pc, #80]	; (800012c <right_shift+0x2e>)
+		movs r1, #2 //2 for pin 2
+ 80000dc:	2102      	movs	r1, #2
+		bl turn_on_led
+ 80000de:	f7ff ffc4 	bl	800006a <turn_on_led>
+
+		ldr r0, =DELAY_FREQ
+ 80000e2:	4815      	ldr	r0, [pc, #84]	; (8000138 <right_shift+0x3a>)
+		bl delay_loop
+ 80000e4:	f7ff ffd3 	bl	800008e <delay_loop>
+
+		ldr r5,=0x00000007 // assign led pattern to r5
+ 80000e8:	4d14      	ldr	r5, [pc, #80]	; (800013c <right_shift+0x3e>)
+		ldr r4,=0x1
+ 80000ea:	4c0e      	ldr	r4, [pc, #56]	; (8000124 <right_shift+0x26>)
+		ldr r6,=0x000000E0 //left limit
+ 80000ec:	4e14      	ldr	r6, [pc, #80]	; (8000140 <right_shift+0x42>)
+		ldr r7,=0x00000007 //right limit
+ 80000ee:	4f13      	ldr	r7, [pc, #76]	; (800013c <right_shift+0x3e>)
+
+080000f0 <left_shift>:
+
+
+	left_shift:
+	cmp r5,r6//It is checked whether it reaches the leftmost bit or not.
+ 80000f0:	42b5      	cmp	r5, r6
+	beq right_shift
+ 80000f2:	d004      	beq.n	80000fe <right_shift>
+	lsls r5,r5,r4
+ 80000f4:	40a5      	lsls	r5, r4
+	ldr r1, =GPIOB_ODR
+ 80000f6:	4913      	ldr	r1, [pc, #76]	; (8000144 <right_shift+0x46>)
+	str r5, [r1]
+ 80000f8:	600d      	str	r5, [r1, #0]
+	ldr r0, =DELAY_FREQ
+ 80000fa:	480f      	ldr	r0, [pc, #60]	; (8000138 <right_shift+0x3a>)
+	b delay_loop1
+ 80000fc:	e7ca      	b.n	8000094 <delay_loop1>
+
+080000fe <right_shift>:
+
+
+	right_shift:
+	cmp r5,r7//It is checked whether it reaches the rightmost bit or not.
+ 80000fe:	42bd      	cmp	r5, r7
+	beq left_shift
+ 8000100:	d0f6      	beq.n	80000f0 <left_shift>
+	lsrs r5,r5,r4
+ 8000102:	40e5      	lsrs	r5, r4
+	ldr r1, =GPIOB_ODR
+ 8000104:	490f      	ldr	r1, [pc, #60]	; (8000144 <right_shift+0x46>)
+	str r5, [r1]
+ 8000106:	600d      	str	r5, [r1, #0]
+	ldr r0, =DELAY_FREQ
+ 8000108:	480b      	ldr	r0, [pc, #44]	; (8000138 <right_shift+0x3a>)
+	b delay_loop2
+ 800010a:	e7c6      	b.n	800009a <delay_loop2>
+	ldr r0, =_estack
+ 800010c:	20002000 	.word	0x20002000
+	ldr r0, =_sdata
+ 8000110:	20000000 	.word	0x20000000
+	ldr r1, =_edata
+ 8000114:	20000000 	.word	0x20000000
+	ldr r2, =_sidata
+ 8000118:	08000150 	.word	0x08000150
+	ldr r2, =_sbss
+ 800011c:	20000000 	.word	0x20000000
+	ldr r4, =_ebss
+ 8000120:	20000000 	.word	0x20000000
+  ldr r3, =#0x01
+ 8000124:	00000001 	.word	0x00000001
+  	ldr r0, =RCC_IOPENR
+ 8000128:	40021034 	.word	0x40021034
+  	ldr r6, =GPIOB_MODER
+ 800012c:	50000400 	.word	0x50000400
+  	ldr r4, =0xFFFF
+ 8000130:	0000ffff 	.word	0x0000ffff
+  	ldr r4, =0x5555
+ 8000134:	00005555 	.word	0x00005555
+		ldr r0, =DELAY_FREQ
+ 8000138:	00082355 	.word	0x00082355
+		ldr r5,=0x00000007 // assign led pattern to r5
+ 800013c:	00000007 	.word	0x00000007
+		ldr r6,=0x000000E0 //left limit
+ 8000140:	000000e0 	.word	0x000000e0
+	ldr r1, =GPIOB_ODR
+ 8000144:	50000414 	.word	0x50000414
+
+Disassembly of section .init:
+
+08000148 <_init>:
+ 8000148:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 800014a:	46c0      	nop			; (mov r8, r8)
+
+Disassembly of section .fini:
+
+0800014c <_fini>:
+ 800014c:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 800014e:	46c0      	nop			; (mov r8, r8)
