@@ -51,6 +51,7 @@ int main(void) {
 				buttonCounter = 1;
 			}
 			TIM2_Clock_Init();
+			TIM2_Interrupt_Config();
 		}
 		buttonPreviousState = buttonNewState;
     }
@@ -108,6 +109,7 @@ void TIM2_Clock_Init(void){
 
 	// Set TIM2 prescaler and period
 	TIM2->PSC = TIMERPSC - 1;
+	TIM2->CNT = (TIMERPERIYOD *buttonCounter) - 1;
 	TIM2->ARR = (TIMERPERIYOD *buttonCounter) - 1;
 }
 void TIM2_Interrupt_Config(void){
