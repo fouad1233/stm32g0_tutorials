@@ -2,6 +2,7 @@
 #include "stm32g031xx.h"
 
 
+
 //variables
 uint64_t tick;
 uint8_t seconds;
@@ -16,10 +17,17 @@ void increase_tick(void);
 uint64_t getTick(void);
 void delay_ms(uint64_t msvalue);
 
+void GPIOC_RCC_Init(void);
+void GPIOC_Init(void);
+void toggle_led(void);
+
+
 int main(void) {
 
 	//init
 	Init_Systick(16000);
+	GPIOC_RCC_Init();
+	GPIOC_Init();
 
 	while(1) {
         delay_ms(1000);
@@ -28,6 +36,18 @@ int main(void) {
 
     return 0;
 }
+void GPIOC_RCC_Init(void){
+	 /* Enable GPIOC clock */
+	RCC->IOPENR |= (1U << 2);
+}
+void GPIOC_Init(void){
+	GPIOC->MODER &= ~(3U << 2*6);
+	GPIOC->MODER |= (1U << 2*6);
+}
+void toggle_led(void){
+	GPIOC->ODR ^= (1U << 6);
+}
+
 void increase_tick(void){
 	tick++;
 
@@ -45,6 +65,5 @@ void delay_ms(uint64_t msvalue){
 	while ((getTick() - startTick) < msvalue)
 	  {
 	  }
-
 }
 
