@@ -71,6 +71,8 @@ int main(void)
 	GPIOA_Init();
 	GPIOB_Init();
 	GPIOC_Init();
+	//Show 0 at initial condition
+	sevenSegmentShowDigit(0,3);
 	TIM2_Clock_Init();
 	TIM2_Interrupt_Config();
 	EXTI_Init();
