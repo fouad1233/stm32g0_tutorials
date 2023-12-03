@@ -11,6 +11,7 @@ uint64_t seconds;
 uint8_t buttonCounter = 1;
 uint8_t buttonPreviousState;
 uint8_t buttonNewState;
+uint8_t ledDirection = 0;
 
 
 
@@ -68,10 +69,20 @@ void EXTI0_1_IRQHandler(void) {
     // This is where you can perform specific actions when the rising edge occurs
 	if (EXTI->RPR1 & EXTI_FPR1_FPIF0) // Check if the interrupt is from line 0
 		{
-		buttonCounter++;
-		if (buttonCounter > 10) {
-			buttonCounter = 1;
+		if(ledDirection == 0){
+			buttonCounter++;
+			if (buttonCounter > 10) {
+				buttonCounter = 9;
+				ledDirection = 1;
+			}
+		}else if(ledDirection){
+			buttonCounter--;
+			if (buttonCounter < 1) {
+				buttonCounter = 2;
+				ledDirection = 0;
+			}
 		}
+
 		TIM2_Clock_Init();
 		TIM2_Interrupt_Config();
 		// Clear EXTI0 pending flag
