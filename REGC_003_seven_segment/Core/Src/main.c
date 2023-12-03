@@ -60,6 +60,8 @@ void EXTI0_1_IRQHandler(void);
 
 void sevenSegmentShowNumber(uint16_t number);
 void sevenSegmentShowDigit(uint8_t number, uint8_t digit);
+void onboard_led_on(void);
+void onboard_led_off(void);
 
 int main(void)
 {
@@ -121,8 +123,6 @@ void sevenSegmentShowNumber(uint16_t number)
 
 void sevenSegmentShowDigit(uint8_t number, uint8_t digit)
 {
-
-
 	// select digit4 using GPIOA with mask
 	GPIOA->ODR |= DIGIT_MASK;
 
@@ -130,37 +130,40 @@ void sevenSegmentShowDigit(uint8_t number, uint8_t digit)
 	GPIOB->ODR = (GPIOB->ODR & SEGMENT_MASK) | numbers[number];
 	GPIOA->ODR &= ~(1<< (digit + 4));
 
-
-
 }
 
 void TIM2_IRQHandler(void)
 {
 	if (TIM2->SR & TIM_SR_UIF)
 	{
+		if (buttonIsPressed){
+			if (numberCounter<40000){
+				numberCounter++;
+				counter = numberCounter/4;
+				onboard_led_off();
+			}else{
+				numberCounter = 0;
+				counter = 0;
+				buttonIsPressed = 0;
+				onboard_led_on();
+			}
 
-		// Code here
-		if (numberCounter<40000){
-			numberCounter++;
-			counter = numberCounter/4;
-		}else{
-			numberCounter = 0;
-			counter = 0;
+			uint8_t digit1 = counter / 1000;
+			uint8_t digit2 = (counter % 1000) / 100;
+			uint8_t digit3 = (counter % 100) / 10;
+			uint8_t digit4 = counter % 10;
+			if (numberCounter%4 == 0){
+				sevenSegmentShowDigit(digit4,3);
+			}else if(numberCounter%3 == 0){
+				sevenSegmentShowDigit(digit3,2);
+			}else if(numberCounter%2 == 0){
+				sevenSegmentShowDigit(digit2,1);
+			}else if(numberCounter%1 == 0){
+				sevenSegmentShowDigit(digit1,0);
+			}
 		}
 
-		uint8_t digit1 = counter / 1000;
-		uint8_t digit2 = (counter % 1000) / 100;
-		uint8_t digit3 = (counter % 100) / 10;
-		uint8_t digit4 = counter % 10;
-		if (numberCounter%4 == 0){
-			sevenSegmentShowDigit(digit4,3);
-		}else if(numberCounter%3 == 0){
-			sevenSegmentShowDigit(digit3,2);
-		}else if(numberCounter%2 == 0){
-			sevenSegmentShowDigit(digit2,1);
-		}else if(numberCounter%1 == 0){
-			sevenSegmentShowDigit(digit1,0);
-		}
+
 		//toggle_led();
 
 		// Clear the interrupt flag
@@ -257,6 +260,15 @@ void GPIOA_Init(void)
 void toggle_led(void)
 {
 	GPIOC->ODR ^= (1U << 6);
+}
+
+void onboard_led_on(void)
+{
+	GPIOC->ODR |= (1U << 6);
+}
+void onboard_led_off(void)
+{
+	GPIOC->ODR &= ~(1U << 6);
 }
 void TIM2_Clock_Init(void)
 {
