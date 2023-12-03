@@ -48,16 +48,6 @@ int main(void) {
 
 	while(1) {
 
-		buttonNewState = readButton();
-		if (buttonPreviousState == 0 && buttonNewState == 1){
-			buttonCounter++;
-			if (buttonCounter > 10) {
-				buttonCounter = 1;
-			}
-			TIM2_Clock_Init();
-			TIM2_Interrupt_Config();
-		}
-		buttonPreviousState = buttonNewState;
     }
 
     return 0;
@@ -78,7 +68,12 @@ void EXTI0_1_IRQHandler(void) {
     // This is where you can perform specific actions when the rising edge occurs
 	if (EXTI->RPR1 & EXTI_FPR1_FPIF0) // Check if the interrupt is from line 0
 		{
-		buttonCounter = 100;
+		buttonCounter++;
+		if (buttonCounter > 10) {
+			buttonCounter = 1;
+		}
+		TIM2_Clock_Init();
+		TIM2_Interrupt_Config();
 		// Clear EXTI0 pending flag
 		EXTI->RPR1 |= EXTI_FPR1_FPIF0;
 		}
@@ -90,8 +85,8 @@ uint8_t readButton(void){
 void EXTI_Init(void) {
 
 
-    // Connect EXTI0 to GPIOA Pin 0
-    EXTI->EXTICR[0] |= EXTI_EXTICR1_EXTI0_0;
+    // Connect EXTI1 to GPIOA Pin 0
+    EXTI->EXTICR[1] |= EXTI_EXTICR1_EXTI0_0;
 
     // Configure EXTI0 to rising edge trigger
     EXTI->RTSR1 |= EXTI_RTSR1_RT0;
@@ -128,8 +123,8 @@ void GPIOA_Init(void){
 	GPIOA->MODER &= ~GPIO_MODER_MODE0; // Clear mode bits for pin 0
 
 	// Enable pull-down resistor for GPIOA Pin 0
-	//GPIOA->PUPDR &= ~GPIO_PUPDR_PUPD0; // Clear pull-up/pull-down bits for pin 0
-	//GPIOA->PUPDR |= GPIO_PUPDR_PUPD0_1; // Set bit for pull-down
+	GPIOA->PUPDR &= ~GPIO_PUPDR_PUPD0; // Clear pull-up/pull-down bits for pin 0
+	GPIOA->PUPDR |= GPIO_PUPDR_PUPD0_1; // Set bit for pull-down
 
 }
 
