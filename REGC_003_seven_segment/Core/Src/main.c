@@ -12,12 +12,12 @@
 #define SEGMENT_DP 1U << (8U - 1U)
 #define SEGMENT_MASK ~(SEGMENT_A | SEGMENT_B | SEGMENT_C | SEGMENT_D | SEGMENT_E | SEGMENT_F | SEGMENT_G | SEGMENT_DP)
 
-#define DIGIT_1 1U << (4U - 1U)
-#define DIGIT_2 1U << (5U - 1U)
-#define DIGIT_3 1U << (6U - 1U)
-#define DIGIT_4 1U << (7U - 1U)
+#define DIGIT_1 1 << (4)
+#define DIGIT_2 1 << (5)
+#define DIGIT_3 1 << (6)
+#define DIGIT_4 1 << (7)
 
-#define DIGIT_MASK ~(DIGIT_1 | DIGIT_2 | DIGIT_3 | DIGIT_4)
+#define DIGIT_MASK (DIGIT_1 | DIGIT_2 | DIGIT_3 | DIGIT_4)
 // seven segment display numbers
 uint8_t numbers[10] = {
 	SEGMENT_A | SEGMENT_B | SEGMENT_C | SEGMENT_D | SEGMENT_E | SEGMENT_F,			   // 0
@@ -43,8 +43,9 @@ uint8_t buttonNewState;
 
 // functions prototypes
 void GPIO_RCC_Init(void);
-void GPIOC_Init(void);
 void GPIOA_Init(void);
+void GPIOB_Init(void);
+void GPIOC_Init(void);
 
 void TIM2_Clock_Init(void);
 void TIM2_Interrupt_Config(void);
@@ -66,6 +67,7 @@ int main(void)
 	// init
 	GPIO_RCC_Init();
 	GPIOA_Init();
+	GPIOB_Init();
 	GPIOC_Init();
 	TIM2_Clock_Init();
 	TIM2_Interrupt_Config();
@@ -75,7 +77,7 @@ int main(void)
 
 	while (1)
 	{
-		sevenSegmentShowNumber(9999);
+		sevenSegmentShowNumber(1234);
 	}
 
 	return 0;
@@ -89,24 +91,31 @@ void sevenSegmentShowNumber(uint16_t number)
 	uint8_t digit4 = number % 10;
 
 	// select digit4 using GPIOA with mask
-	GPIOA->ODR = (GPIOA->ODR & DIGIT_MASK) & ~DIGIT_4;
+	GPIOA->ODR |= DIGIT_MASK;
+
 	// set GPIOB to output for digit4 using numbers with 8 bit mask
 	GPIOB->ODR = (GPIOB->ODR & SEGMENT_MASK) | numbers[digit4];
+	GPIOA->ODR &= ~GPIO_ODR_OD7_Msk;
 
 	// select digit3 using GPIOA with mask
-	GPIOA->ODR = (GPIOA->ODR & DIGIT_MASK) & ~DIGIT_3;
+	GPIOA->ODR |= DIGIT_MASK;
+
 	// set GPIOB to output for digit3 using numbers
 	GPIOB->ODR = (GPIOB->ODR & SEGMENT_MASK) | numbers[digit3];
+	GPIOA->ODR &= ~GPIO_ODR_OD6_Msk;
 
 	// select digit2 using GPIOA with mask
-	GPIOA->ODR = (GPIOA->ODR & DIGIT_MASK) & ~DIGIT_2;
+	GPIOA->ODR |= DIGIT_MASK;
 	// set GPIOB to output for digit2 using numbers
 	GPIOB->ODR = (GPIOB->ODR & SEGMENT_MASK) | numbers[digit2];
+	GPIOA->ODR &= ~GPIO_ODR_OD5_Msk;
 
 	// select digit1 using GPIOA with mask
-	GPIOA->ODR = (GPIOA->ODR & DIGIT_MASK) & ~DIGIT_1;
+	GPIOA->ODR |= DIGIT_MASK;
 	// set GPIOB to output for digit1 using numbers
 	GPIOB->ODR = (GPIOB->ODR & SEGMENT_MASK) | numbers[digit1];
+	GPIOA->ODR &= ~GPIO_ODR_OD4_Msk;
+
 }
 
 void TIM2_IRQHandler(void)
@@ -177,6 +186,21 @@ void GPIOC_Init(void)
 	// Configure GPIO for board on led
 	GPIOC->MODER &= ~(3U << 2 * 6);
 	GPIOC->MODER |= (1U << 2 * 6);
+}
+void GPIOB_Init(void)
+{
+	// clear GPIOB Pin 0,1,2,3,4,5,6,7,8
+	GPIOB->MODER &= SEGMENT_MASK & SEGMENT_MASK << 8; // Clear mode bits for pin 0
+	// Set GPIOB Pin 0,1,2,3,4,5,6,7,8 as output
+	GPIOB->MODER |= (1U << 2 * 0); // Set mode bits for pin 0
+	GPIOB->MODER |= (1U << 2 * 1); // Set mode bits for pin 1
+	GPIOB->MODER |= (1U << 2 * 2); // Set mode bits for pin 2
+	GPIOB->MODER |= (1U << 2 * 3); // Set mode bits for pin 3
+	GPIOB->MODER |= (1U << 2 * 4); // Set mode bits for pin 4
+	GPIOB->MODER |= (1U << 2 * 5); // Set mode bits for pin 5
+	GPIOB->MODER |= (1U << 2 * 6); // Set mode bits for pin 6
+	GPIOB->MODER |= (1U << 2 * 7); // Set mode bits for pin 7
+	GPIOB->MODER |= (1U << 2 * 8); // Set mode bits for pin 8
 }
 void GPIOA_Init(void)
 {
