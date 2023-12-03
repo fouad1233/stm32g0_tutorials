@@ -34,6 +34,8 @@ uint8_t numbers[10] = {
 // defines
 #define TIMERPSC 160
 #define TIMERPERIYOD 25
+#define WATCHDOG_PRESCALER 4
+#define WATCHDOG_RELOAD 1000
 // variables
 uint64_t tick;
 uint16_t numberCounter;
@@ -62,6 +64,9 @@ void sevenSegmentShowNumber(uint16_t number);
 void sevenSegmentShowDigit(uint8_t number, uint8_t digit);
 void onboard_led_on(void);
 void onboard_led_off(void);
+
+void IWDG_Init(void);
+void IWDG_Enable(void);
 
 int main(void)
 {
@@ -146,7 +151,6 @@ void TIM2_IRQHandler(void)
 			}else{
 				numberCounter = 0;
 				counter = 0;
-				buttonIsPressed = 0;
 				onboard_led_on();
 			}
 
@@ -178,8 +182,8 @@ void EXTI0_1_IRQHandler(void)
 	// This is where you can perform specific actions when the rising edge occurs
 	if (EXTI->RPR1 & EXTI_FPR1_FPIF0) // Check if the interrupt is from line 0
 	{
-		buttonIsPressed =1;
-
+		IWDG_Enable();
+		buttonIsPressed = 1;
 
 		// Clear EXTI0 pending flag
 		EXTI->RPR1 |= EXTI_FPR1_FPIF0;
@@ -299,4 +303,21 @@ void Stop_TIM2(void)
 {
 	// Stop TIM2
 	TIM2->CR1 &= ~TIM_CR1_CEN;
+}
+void IWDG_Init(void) {
+    // Enable write access to IWDG_PR and IWDG_RLR registers
+    IWDG->KR = 0x5555;
+
+    // Set prescaler and reload values
+    IWDG->PR = WATCHDOG_PRESCALER;    // Prescaler
+    IWDG->RLR = WATCHDOG_RELOAD; // Reload value
+
+    // Reload the watchdog counter
+    IWDG->KR = 0xAAAA;
+
+}
+void IWDG_Enable(void){
+
+    // Enable the watchdog
+    IWDG->KR = 0xCCCC;
 }
