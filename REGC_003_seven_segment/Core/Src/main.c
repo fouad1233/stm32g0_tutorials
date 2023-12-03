@@ -32,14 +32,13 @@ uint8_t numbers[10] = {
 	SEGMENT_A | SEGMENT_B | SEGMENT_C | SEGMENT_D | SEGMENT_F | SEGMENT_G,			   // 9
 };
 // defines
-#define TIMERPSC 16000
-#define TIMERPERIYOD 1000 / 1000
+#define TIMERPSC 160
+#define TIMERPERIYOD 25
 // variables
 uint64_t tick;
-uint64_t seconds;
-uint8_t buttonCounter = 1;
-uint8_t buttonPreviousState;
-uint8_t buttonNewState;
+uint16_t numberCounter;
+uint32_t counter;
+uint8_t buttonIsPressed;
 
 // functions prototypes
 void GPIO_RCC_Init(void);
@@ -60,6 +59,7 @@ void EXTI_Init(void);
 void EXTI0_1_IRQHandler(void);
 
 void sevenSegmentShowNumber(uint16_t number);
+void sevenSegmentShowDigit(uint8_t number, uint8_t digit);
 
 int main(void)
 {
@@ -77,7 +77,7 @@ int main(void)
 
 	while (1)
 	{
-		sevenSegmentShowNumber(1234);
+		//sevenSegmentShowNumber(1234);
 	}
 
 	return 0;
@@ -118,13 +118,50 @@ void sevenSegmentShowNumber(uint16_t number)
 
 }
 
+
+void sevenSegmentShowDigit(uint8_t number, uint8_t digit)
+{
+
+
+	// select digit4 using GPIOA with mask
+	GPIOA->ODR |= DIGIT_MASK;
+
+	// set GPIOB to output for digit4 using numbers with 8 bit mask
+	GPIOB->ODR = (GPIOB->ODR & SEGMENT_MASK) | numbers[number];
+	GPIOA->ODR &= ~(1<< (digit + 4));
+
+
+
+}
+
 void TIM2_IRQHandler(void)
 {
 	if (TIM2->SR & TIM_SR_UIF)
 	{
+
 		// Code here
-		seconds++;
-		toggle_led();
+		if (numberCounter<40000){
+			numberCounter++;
+			counter = numberCounter/4;
+		}else{
+			numberCounter = 0;
+			counter = 0;
+		}
+
+		uint8_t digit1 = counter / 1000;
+		uint8_t digit2 = (counter % 1000) / 100;
+		uint8_t digit3 = (counter % 100) / 10;
+		uint8_t digit4 = counter % 10;
+		if (numberCounter%4 == 0){
+			sevenSegmentShowDigit(digit4,3);
+		}else if(numberCounter%3 == 0){
+			sevenSegmentShowDigit(digit3,2);
+		}else if(numberCounter%2 == 0){
+			sevenSegmentShowDigit(digit2,1);
+		}else if(numberCounter%1 == 0){
+			sevenSegmentShowDigit(digit1,0);
+		}
+		//toggle_led();
 
 		// Clear the interrupt flag
 		TIM2->SR &= ~TIM_SR_UIF;
@@ -136,13 +173,9 @@ void EXTI0_1_IRQHandler(void)
 	// This is where you can perform specific actions when the rising edge occurs
 	if (EXTI->RPR1 & EXTI_FPR1_FPIF0) // Check if the interrupt is from line 0
 	{
-		buttonCounter++;
-		if (buttonCounter > 10)
-		{
-			buttonCounter = 1;
-		}
-		TIM2_Clock_Init();
-		TIM2_Interrupt_Config();
+		buttonIsPressed =1;
+
+
 		// Clear EXTI0 pending flag
 		EXTI->RPR1 |= EXTI_FPR1_FPIF0;
 	}
