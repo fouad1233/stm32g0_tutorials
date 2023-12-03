@@ -3,6 +3,7 @@
 void SystemClock_Config(void);
 void IWDG_Init(void);
 void IWDG_Refresh(void);
+void SysTick_Handler(void);
 
 
 void Init_Systick(uint32_t tick);
@@ -98,4 +99,11 @@ void delay_ms(uint64_t msvalue){
 	  {
 	  }
 
+}
+/**
+  * @brief This function handles System tick timer.
+  */
+void SysTick_Handler(void)
+{
+	increase_tick();
 }

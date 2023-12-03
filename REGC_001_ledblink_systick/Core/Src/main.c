@@ -15,6 +15,7 @@ void Systick_Handler(void);
 void increase_tick(void);
 uint64_t getTick(void);
 void delay_ms(uint64_t msvalue);
+void SysTick_Handler(void);
 
 int main(void) {
 
@@ -47,4 +48,12 @@ void delay_ms(uint64_t msvalue){
 	  }
 
 }
+/**
+  * @brief This function handles System tick timer.
+  */
+void SysTick_Handler(void)
+{
+	increase_tick();
+}
+
 
