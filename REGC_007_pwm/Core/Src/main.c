@@ -45,15 +45,14 @@ int main(void) {
 void RCC_Init(void){
 	RCC->IOPENR |= RCC_IOPENR_GPIOAEN;  // Enable GPIOA clock
 
-	RCC->APBENR1 |= RCC_APBENR1_TIM2EN;;  // Enable TIM2 clock
-
+	RCC->APBENR1 |= RCC_APBENR1_TIM2EN;  // Enable TIM2 clock
 }
 
 void GPIOA_Init(void){
 	GPIOA->MODER &= ~GPIO_MODER_MODE1_Msk;
 	GPIOA->MODER |= GPIO_MODER_MODE1_1;  // Alternate function mode
 	GPIOA->AFR[0] &= ~GPIO_AFRL_AFSEL1_Msk;
-	GPIOA->AFR[0] |= (1 << GPIO_AFRL_AFSEL1_Pos);  // AF1 for TIM2
+	GPIOA->AFR[0] |= GPIO_AFRL_AFSEL1_0;  // AF1 for TIM2
 }
 
 void TIM2_Init(void) {
@@ -94,11 +93,13 @@ void TIM2_Init(void) {
     TIM2->CR1 |= TIM_CR1_CKD_0;
 
 
-    TIM2->CR1	|= TIM_CR1_ARPE;
+    TIM2->CR1  |= TIM_CR1_ARPE;
 
     TIM2->CCER |= TIM_CCER_CC2E;  // Enable capture/compare channel 2
 
     TIM2->CCER |= TIM_CCER_CC1E;
+
+
 }
 void StartPWM(void) {
     // Enable the timer
