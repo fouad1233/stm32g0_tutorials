@@ -42,6 +42,13 @@ In order to connect to your MC and see these, you can open a serial port from yo
 choose correct uart setup, and choose serial port. If your device is connected a COM port should show up here. Choose that.
 4. Choose encoding as UTF-8 and hit OK.
 You should now have a serial connection to your board.
+**************
+Problem 1. In this problem, you will connect your board to the PC using UART protocol. For this you will need to create an initialization routine for UART, and create send and receive functions. You should not use interrupts for this assignment. List the possible transmit and receive bit rates for UART serial communication according to the EISA RS-232 communication Standard.
+Basically, create two functions as given below
+void uart_tx(uint8_t c); uint8_t uart_rx(void);
+and in your main loop, call them like
+while(1) { uart_tx(uart_rx()); }
+
 */
 void RCC_Init(void);
 void GPIOA_Init(void);
@@ -49,6 +56,9 @@ void USART2_Init(void);
 void printChar(uint8_t c);
 int _print(int f, char *ptr, int len);
 void print(char *s);
+uint8_t uart_rx(void);
+void uart_tx(uint8_t c);
+
 int main(void)
 {
 	RCC_Init();
@@ -57,7 +67,7 @@ int main(void)
 
 	while (1)
 	{
-		print("Hello\n");
+		uart_tx(uart_rx());
 	}
 }
 
@@ -111,4 +121,20 @@ void print(char *s)
 		length++;
 	}
 	_print(0, s, length);
+}
+uint8_t uart_rx(void)
+{
+	// wait until receive is complete
+	while (!(USART2->ISR & USART_ISR_RXNE_RXFNE))
+		;
+	// return the received data
+	return USART2->RDR;
+}
+void uart_tx(uint8_t c)
+{
+	// write c to the transmit data register
+	USART2->TDR = c;
+	// wait until transmit is complete
+	while (!(USART2->ISR & USART_ISR_TC))
+		;
 }

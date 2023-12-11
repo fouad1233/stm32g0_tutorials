@@ -1,6 +1,6 @@
 import serial
 import serial.tools.list_ports
-
+import time
 def find_stm32_serial_port():
     available_ports = list(serial.tools.list_ports.comports())
 
@@ -29,6 +29,15 @@ def main():
 
     try:
         while True:
+            #send a character to the microcontroller
+            sendedData = input("Enter a character: ")
+            #send the data
+            isSended = ser.write(sendedData.encode())
+            time.sleep(0.01)
+            print(f"Sent: {sendedData}")
+            while(ser.in_waiting > 0):
+                #0.1 ms delay
+                time.sleep(0.001)
                 if readLine == False:
                     # Read one byte from the serial port
                     received_byte = ser.read()
@@ -43,12 +52,12 @@ def main():
                     print(f"Received: {received_data}")
                     
                 
-                    
+                
     except KeyboardInterrupt:
         print("\nExiting program.")
     finally:
         ser.close()
 
 if __name__ == "__main__":
-    readLine = True
+    readLine = False
     main()
