@@ -1,0 +1,4 @@
+main.c:22:6:WWDG_Configuration	1
+main.c:32:6:Feed_Watchdog	1
+main.c:38:5:main	1
+main.c:76:6:delay	2
