@@ -48,6 +48,7 @@ void GPIOA_Init(void);
 void USART2_Init(void);
 void printChar(uint8_t c);
 int _print(int f, char *ptr, int len);
+void print(char *s);
 int main(void)
 {
 	RCC_Init();
@@ -56,7 +57,7 @@ int main(void)
 
 	while (1)
 	{
-		_print(0, "Hello\n", 6);
+		print("Hello\n");
 	}
 }
 
@@ -100,4 +101,14 @@ int _print(int f, char *ptr, int len)
 		printChar(ptr[i]);
 	}
 	return len; // return length
+}
+void print(char *s)
+{
+	// count number of characters in s string until a null byte comes `\0`
+	int length = 0;
+	while (s[length] != '\0')
+	{
+		length++;
+	}
+	_print(0, s, length);
 }
