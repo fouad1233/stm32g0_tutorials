@@ -1,43 +1,48 @@
 import serial
-
-#find the connected serial port otomaticly
 import serial.tools.list_ports
-ports = list(serial.tools.list_ports.comports())
-for p in ports:
-    print(p)
-    if "USB Serial Port" in p.description:
-        ser = serial.Serial(p.device, 9600)
-        print("Connected to " + p.device)
-        break
-   
-def detect_auto_baudrate(port):
-    baudrates = [9600, 19200, 38400, 57600, 115200]  # List of possible baudrates to test
 
-    for baudrate in baudrates:
-        ser = serial.Serial(port, baudrate)
-        ser.timeout = 1  # Set a timeout value for reading from the serial port
+def find_stm32_serial_port():
+    available_ports = list(serial.tools.list_ports.comports())
 
-        # Send a test message
-        ser.write(b'U')  # You can modify this message according to your needs
+    for port in available_ports:
+        if "STM32" in port.description or "VID:PID" in port.hwid:
+            return port.device
 
-        # Try to read a response
-        response = ser.read(1)
-
-        if response == b'A':  # You can modify this condition based on the expected response
-            print(f"Detected baudrate: {baudrate}")
-            ser.close()
-            return baudrate
-
-        ser.close()
-
-    #print("Baudrate detection failed")
     return None
 
+def main():
+    serial_port = find_stm32_serial_port()
 
-# Usage example
-port = '/dev/cu.usbmodem1103'  # Replace with the actual port name
-baudrate = detect_auto_baudrate(port)
-while baudrate ==None:
-    baudrate = detect_auto_baudrate(port)
-if baudrate:
-    print(f"Auto-detected baudrate: {baudrate}")
+    if serial_port is None:
+        print("STM32F4 serial port not found. Please check the connection.")
+        return
+
+    print(f"Found STM32F4 serial port at {serial_port}")
+
+    baud_rate = 9600  # Should match the baud rate configured on the STM32F4
+
+    try:
+        ser = serial.Serial(serial_port, baud_rate)
+    except serial.SerialException:
+        print(f"Failed to open {serial_port}. Make sure it's available and not in use.")
+        return
+
+    try:
+        while True:
+            # Read one byte from the serial port
+            received_byte = ser.read()
+
+            if len(received_byte) > 0:
+                # Interpret the received byte as an 8-bit integer
+                received_value = ord(received_byte)
+
+                # Print the received value
+                print(f"Received: {chr(received_value)}")
+                
+    except KeyboardInterrupt:
+        print("\nExiting program.")
+    finally:
+        ser.close()
+
+if __name__ == "__main__":
+    main()
