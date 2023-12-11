@@ -47,6 +47,7 @@ void RCC_Init(void);
 void GPIOA_Init(void);
 void USART2_Init(void);
 void printChar(uint8_t c);
+int _print(int f, char *ptr, int len);
 int main(void)
 {
 	RCC_Init();
@@ -55,7 +56,7 @@ int main(void)
 
 	while (1)
 	{
-		printChar('a');
+		_print(0, "Hello\n", 6);
 	}
 }
 
@@ -89,4 +90,14 @@ void printChar(uint8_t c)
 	// wait until transmit is complete
 	while (!(USART2->ISR & USART_ISR_TC))
 		;
+}
+int _print(int f, char *ptr, int len)
+{
+	(void)f; // don't do anthing with f
+	// call printChar within a for loop len times
+	for (int i = 0; i < len; i++)
+	{
+		printChar(ptr[i]);
+	}
+	return len; // return length
 }

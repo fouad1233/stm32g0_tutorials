@@ -29,20 +29,26 @@ def main():
 
     try:
         while True:
-            # Read one byte from the serial port
-            received_byte = ser.read()
+                if readLine == False:
+                    # Read one byte from the serial port
+                    received_byte = ser.read()
+                    if len(received_byte) > 0:
+                        # Interpret the received byte as an 8-bit integer
+                        received_value = ord(received_byte)
 
-            if len(received_byte) > 0:
-                # Interpret the received byte as an 8-bit integer
-                received_value = ord(received_byte)
-
-                # Print the received value
-                print(f"Received: {chr(received_value)}")
+                        # Print the received value
+                        print(f"Received: {chr(received_value)}")
+                else:
+                    received_data = ser.readline().decode('utf-8').rstrip()
+                    print(f"Received: {received_data}")
+                    
                 
+                    
     except KeyboardInterrupt:
         print("\nExiting program.")
     finally:
         ser.close()
 
 if __name__ == "__main__":
+    readLine = True
     main()
