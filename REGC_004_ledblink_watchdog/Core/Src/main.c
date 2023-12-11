@@ -15,7 +15,7 @@ void delay_ms(uint64_t msvalue);
 uint64_t tick;
 
 
-#define LEDDELAYMS    300
+#define LEDDELAYMS    10000
 
 void delay(volatile uint32_t);
 

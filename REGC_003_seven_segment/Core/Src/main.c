@@ -179,7 +179,7 @@ void EXTI0_1_IRQHandler(void)
 	if (EXTI->RPR1 & EXTI_FPR1_FPIF0) // Check if the interrupt is from line 0
 	{
 		buttonIsPressed =1;
-
+		numberCounter = 0;
 
 		// Clear EXTI0 pending flag
 		EXTI->RPR1 |= EXTI_FPR1_FPIF0;

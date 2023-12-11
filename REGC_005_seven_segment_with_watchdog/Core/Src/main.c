@@ -35,7 +35,7 @@ uint8_t numbers[10] = {
 #define TIMERPSC 160
 #define TIMERPERIYOD 25
 #define WATCHDOG_PRESCALER 7
-#define WATCHDOG_RELOAD 2048
+#define WATCHDOG_RELOAD 1024
 // variables
 uint64_t tick;
 uint16_t numberCounter;
