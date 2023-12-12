@@ -1,5 +1,5 @@
 #include "stm32g0xx.h"
-
+#include <math.h>
 
 void clearRowsKeypad(void);
 void setRowsKeypad (void);
@@ -163,7 +163,8 @@ void EXTI4_15IRQHandler(void){
 
 int main(void){
 
-RCC->IOPENR |=(1U<<0);/*Enable GPIOB clock*/
+RCC->IOPENR |=(1U<<0);/*Enable GPIOA clock*/
+RCC->IOPENR |=(1U<<1);/*Enable GPIOB clock*/
 
 /*Set up PB4,PB5,PB6,PB7 as output row(output=01)*/
 GPIOB->MODER &=~(3U<<8);
@@ -187,10 +188,10 @@ GPIOA->MODER &=~(3U<<10);/*for PA5*/
 GPIOA->PUPDR |=(2U<<10);/*Pull down mode*/
 
 GPIOA->MODER &=~(3U<<12);/*for PA6*/
-GPIOA->PUPDR |=(2U<<10);/*Pull down mode*/
+GPIOA->PUPDR |=(2U<<12);/*Pull down mode*/
 
 GPIOA->MODER &=~(3U<<14);/*for PA7*/
-GPIOA->PUPDR |=(2U<<10);/*Pull down mode*/
+GPIOA->PUPDR |=(2U<<14);/*Pull down mode*/
 
 
 /*Set up interrupt for input*/
@@ -246,7 +247,7 @@ void storenumber(int sayı){
         int i;
 
 		for(i=0;i<number-1;i++){
-			ust=10^(number - i)-1;
+			ust=pow(10,number-i-1);
 			count=count+numbers[i]*ust;
 
 		}
