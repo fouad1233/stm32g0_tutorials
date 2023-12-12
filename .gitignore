@@ -2,3 +2,5 @@
 /.metadata/
 *.launch
 **/*.launch
+REGC_008_withkeypad/.settings/language.settings.xml
+.vscode/c_cpp_properties.json
