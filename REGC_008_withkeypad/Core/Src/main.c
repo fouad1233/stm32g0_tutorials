@@ -4,43 +4,78 @@
 void clearRowsKeypad(void);
 void setRowsKeypad(void);
 void storenumber(int sayı);
-uint32_t number; // number of stored digits
+uint32_t number=0;// number of stored digits
 uint32_t count;	 // duty cycle rate
-uint32_t n;
 uint32_t ust;
-int numbers[] = {0, 0, 0, 0, 0}; // store digit
+uint8_t b;
+uint32_t numbers[3]; // store digit
+
+
+void DelayMs(uint32_t ms) {
+	for (uint32_t i = 0; i < ms * 1000; i++) {
+	        // Hiçbir şey yapma - sadece beklet
+	    }
+}
+
+void storenumber(int sayı)
+{
+	if (sayı >= 0 && sayı <=9 && number!=3)
+	{
+		numbers[number] = sayı;
+		number = number + 1;
+		DelayMs(1000);
+	}
+
+	if (sayı == 10 && number != 0)
+	{
+		int i;
+
+		for (i = 0; i < number; i++)
+		{
+			ust = pow(10, number - i - 1);
+			count = count + numbers[i] * ust;
+		}
+		//count=0;
+		number = 0;
+		numbers[0] = 0;
+		numbers[1] = 0;
+		numbers[2] = 0;
+
+	}
+
+
+
+}
+
+
 
 void EXTI4_15_IRQHandler(void)
 {
 
 	if ((EXTI->RPR1 >> 4) & 1)
 	{ // Interrupt from PA4
-		clearRowsKeypad();
+	    clearRowsKeypad();
 
 		GPIOB->ODR ^= (1U << 4); // PB4
-		if ((GPIOA->IDR >> 4) & 1)
-		{
-			storenumber(1);
-		}
+		if ((GPIOA->IDR >> 4) & 1){
+		   storenumber(1);
+		   }
 		GPIOB->ODR ^= (1U << 4); // PB4
 
 		GPIOB->ODR ^= (1U << 5); // PB5
-		if ((GPIOA->IDR >> 4) & 1)
-		{
-			storenumber(4);
-		}
+		if ((GPIOA->IDR >> 4) & 1){
+		   storenumber(4);
+		   }
 		GPIOB->ODR ^= (1U << 5); // PB5
 
 		GPIOB->ODR ^= (1U << 6); // PB6
-		if ((GPIOA->IDR >> 4) & 1)
-		{
+		if ((GPIOA->IDR >> 4) & 1){
 			storenumber(7);
 		}
 		GPIOB->ODR ^= (1U << 6); // PB6
 
 		GPIOB->ODR ^= (1U << 7); // PB7
-		if ((GPIOA->IDR >> 4) & 1)
-		{
+		if ((GPIOA->IDR >> 4) & 1){
 			storenumber(11);
 		}
 		GPIOB->ODR ^= (1U << 7); // PB7
@@ -111,7 +146,7 @@ void EXTI4_15_IRQHandler(void)
 		GPIOB->ODR ^= (1U << 7); // PB7
 		if ((GPIOA->IDR >> 6) & 1)
 		{
-			storenumber(11);
+			storenumber(10);
 		}
 		GPIOB->ODR ^= (1U << 7); // PB7
 
@@ -216,10 +251,10 @@ int main(void)
 
 	/*NVIC*/
 
-	NVIC_SetPriority(EXTI4_15_IRQn, 0);
+	NVIC_SetPriority(EXTI4_15_IRQn,2);
 	NVIC_EnableIRQ(EXTI4_15_IRQn);
 
-	/*Set all rows*/		 /*tuşların hepsi aktif 5v oldu*/
+	/*Set all rows*/
 	GPIOB->ODR |= (1U << 4); /*PB4*/
 	GPIOB->ODR |= (1U << 5); /*PB5*/
 	GPIOB->ODR |= (1U << 6); /*PB6*/
@@ -227,72 +262,27 @@ int main(void)
 
 	while (1)
 	{
+
 	}
 	return 0;
 }
 
-void storenumber(int sayı)
-{
-	if (sayı >= 0 && sayı <= 9 && numbers[0] != 0)
-	{
-		numbers[number] = sayı;
-		number = number + 1;
-	}
-	else if (sayı >= 0 && sayı <= 9 && numbers[0] == 0)
-	{
-		number = 0;
-	}
-	else if (sayı == 10 && number != 0)
-	{
-		int i;
 
-		for (i = 0; i < number - 1; i++)
-		{
-			ust = pow(10, number - i - 1);
-			count = count + numbers[i] * ust;
-		}
-		number = 0;
-		numbers[0] = 0;
-		numbers[1] = 0;
-		numbers[2] = 0;
-		numbers[3] = 0;
-		numbers[4] = 0;
-	}
-
-	else if (sayı == 10 && number == 0)
-	{
-		number = 0;
-		numbers[0] = 0;
-		numbers[1] = 0;
-		numbers[2] = 0;
-		numbers[3] = 0;
-		numbers[4] = 0;
-	}
-	else
-	{
-		number = 0;
-		numbers[0] = 0;
-		numbers[1] = 0;
-		numbers[2] = 0;
-		numbers[3] = 0;
-		numbers[4] = 0;
-	}
-}
 
 void clearRowsKeypad(void)
 {
 	/*Clearing the rows*/
-	GPIOA->ODR &= ~(1U << 4); /*PB4*/
-	GPIOA->ODR &= ~(1U << 5); /*PB5*/
-	GPIOA->ODR &= ~(1U << 6); /*PB6*/
-	GPIOA->ODR &= ~(1U << 7); /*PB7*/
+	GPIOB->ODR &= ~(1U << 4); /*PB4*/
+	GPIOB->ODR &= ~(1U << 5); /*PB5*/
+	GPIOB->ODR &= ~(1U << 6); /*PB6*/
+	GPIOB->ODR &= ~(1U << 7); /*PB7*/
 }
 
 void setRowsKeypad(void)
 {
 	/*Setting rows*/
-	GPIOA->ODR |= (1U << 4); /*PB4*/
-	GPIOA->ODR |= (1U << 5); /*PB5*/
-	GPIOA->ODR |= (1U << 6); /*PB6*/
-	GPIOA->ODR |= (1U << 7); /*PB7*/
+	GPIOB->ODR |= (1U << 4); /*PB4*/
+	GPIOB->ODR |= (1U << 5); /*PB5*/
+	GPIOB->ODR |= (1U << 6); /*PB6*/
+	GPIOB->ODR |= (1U << 7); /*PB7*/
 }
