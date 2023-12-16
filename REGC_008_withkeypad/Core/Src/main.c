@@ -16,14 +16,17 @@ void USART2_Init(void);
 void printChar(uint8_t c);
 int _print(int f, char *ptr, int len);
 void print(char *s);
+void printDutyCycle(uint8_t dutyCyclePercentage);
+void TIM3_IRQHandler(void);
+void Init_TIM3(void);
 
-uint32_t number=0;// number of stored digits
-uint32_t count;	 // duty cycle rate
+uint32_t number = 0; // number of stored digits
+uint32_t count;		 // duty cycle rate
 uint32_t ust;
 uint8_t b;
 uint32_t numbers[3]; // store digit
 
-//pwm variables and prototpes
+// pwm variables and prototpes
 void Init_Systick(uint32_t tick);
 void increase_tick(void);
 void TIM2_IRQHandler(void);
@@ -42,31 +45,25 @@ uint8_t pwmDirection = 1; // 1 for increase, 0 for decrease
 // defines
 #define SYSTICK_FREQ 16000 // Khz
 
-
 int main(void)
 {
 	RCC_Init();
-    GPIOB_Init();/*Set up PB4,PB5,PB6,PB7 as output row(output=01)*/
-	GPIOA_Init();/*Set up PA4,PA5,PA6,PA7 as input column(input=00)*/
+	GPIOB_Init(); /*Set up PB4,PB5,PB6,PB7 as output row(output=01)*/
+	GPIOA_Init(); /*Set up PA4,PA5,PA6,PA7 as input column(input=00)*/
 	Init_Systick(SYSTICK_FREQ);
 	init_pwm2();
+	Init_TIM3();
 	EXTI_Init();
-	setRowsKeypad();/*Set all rows*/
+	setRowsKeypad(); /*Set all rows*/
 	SetDutyCycle(0);
 	StartPWM();
 	USART2_Init();
 
-
-
-
-
 	while (1)
 	{
-
 	}
 	return 0;
 }
-
 
 void RCC_Init(void)
 {
@@ -76,13 +73,14 @@ void RCC_Init(void)
 	RCC->APBENR2 |= RCC_APBENR2_SYSCFGEN;
 	// Enables GPIOA peripheral
 	RCC->AHBENR |= 1;
-	//Enable usart2 clock
+	// Enable usart2 clock
 	RCC->APBENR1 |= RCC_APBENR1_USART2EN;
 	// Enable TIM2 clock
 	RCC->APBENR1 |= RCC_APBENR1_TIM2EN;
 }
 
-void GPIOB_Init(void){
+void GPIOB_Init(void)
+{
 	/*Set up PB4,PB5,PB6,PB7 as output row(output=01)*/
 	GPIOB->MODER &= ~(3U << 8);
 	GPIOB->MODER |= (1U << 8); /*for PB4*/
@@ -105,9 +103,8 @@ void GPIOB_Init(void){
 	GPIOB->AFR[0] |= (2U << 4 * 3);
 }
 
-
-
-void GPIOA_Init(void){
+void GPIOA_Init(void)
+{
 	/*Set up PA4,PA5,PA6,PA7 as input column(input=00)*/
 	GPIOA->MODER &= ~(3U << 8); /*for PA4*/
 	GPIOA->PUPDR |= (2U << 8);	/*Pull down mode*/
@@ -128,56 +125,53 @@ void GPIOA_Init(void){
 	GPIOA->AFR[0] |= (GPIO_AFRL_AFSEL2_0 | GPIO_AFRL_AFSEL3_0);
 }
 
-
 void EXTI_Init(void)
 {
 	/*Set up interrupt for input*/
-		EXTI->EXTICR[2] &= ~EXTI_EXTICR2_EXTI4_Msk; /*PA4*/
-		EXTI->EXTICR[2] &= ~EXTI_EXTICR2_EXTI5_Msk; /*PA5*/
-		EXTI->EXTICR[2] &= ~EXTI_EXTICR2_EXTI6_Msk; /*PA6*/
-		EXTI->EXTICR[2] &= ~EXTI_EXTICR2_EXTI7_Msk; /*PA7*/
+	EXTI->EXTICR[2] &= ~EXTI_EXTICR2_EXTI4_Msk; /*PA4*/
+	EXTI->EXTICR[2] &= ~EXTI_EXTICR2_EXTI5_Msk; /*PA5*/
+	EXTI->EXTICR[2] &= ~EXTI_EXTICR2_EXTI6_Msk; /*PA6*/
+	EXTI->EXTICR[2] &= ~EXTI_EXTICR2_EXTI7_Msk; /*PA7*/
 
-		/*Rising edge*/
-		EXTI->RTSR1 |= EXTI_RTSR1_RT4;
-		EXTI->FTSR1 &= ~EXTI_FTSR1_FT4;
-		EXTI->RTSR1 |= EXTI_RTSR1_RT5;
-		EXTI->FTSR1 &= ~EXTI_FTSR1_FT5;
-		EXTI->RTSR1 |= EXTI_RTSR1_RT6;
-		EXTI->FTSR1 &= ~EXTI_FTSR1_FT6;
-		EXTI->RTSR1 |= EXTI_RTSR1_RT7;
-		EXTI->FTSR1 &= ~EXTI_FTSR1_FT7;
+	/*Rising edge*/
+	EXTI->RTSR1 |= EXTI_RTSR1_RT4;
+	EXTI->FTSR1 &= ~EXTI_FTSR1_FT4;
+	EXTI->RTSR1 |= EXTI_RTSR1_RT5;
+	EXTI->FTSR1 &= ~EXTI_FTSR1_FT5;
+	EXTI->RTSR1 |= EXTI_RTSR1_RT6;
+	EXTI->FTSR1 &= ~EXTI_FTSR1_FT6;
+	EXTI->RTSR1 |= EXTI_RTSR1_RT7;
+	EXTI->FTSR1 &= ~EXTI_FTSR1_FT7;
 
-		/*MASK*/
-		EXTI->IMR1 |= EXTI_IMR1_IM4;
-		EXTI->IMR1 |= EXTI_IMR1_IM5;
-		EXTI->IMR1 |= EXTI_IMR1_IM6;
-		EXTI->IMR1 |= EXTI_IMR1_IM7;
+	/*MASK*/
+	EXTI->IMR1 |= EXTI_IMR1_IM4;
+	EXTI->IMR1 |= EXTI_IMR1_IM5;
+	EXTI->IMR1 |= EXTI_IMR1_IM6;
+	EXTI->IMR1 |= EXTI_IMR1_IM7;
 
-		/*NVIC*/
+	/*NVIC*/
 
-		NVIC_SetPriority(EXTI4_15_IRQn,2);
-		NVIC_EnableIRQ(EXTI4_15_IRQn);
-
-
+	NVIC_SetPriority(EXTI4_15_IRQn, 3);
+	NVIC_EnableIRQ(EXTI4_15_IRQn);
 }
 
-
-
-void DelayMs(uint32_t ms) {
-	for (uint32_t i = 0; i < ms * 1000; i++) {
-	        // Hiçbir şey yapma - sadece beklet
-	    }
+void DelayMs(uint32_t ms)
+{
+	for (uint32_t i = 0; i < ms * 1000; i++)
+	{
+		// Hiçbir şey yapma - sadece beklet
+	}
 }
 
 void storenumber(int sayı)
 {
-	if (sayı >= 0 && sayı <=9 && number!=3)
+	if (sayı >= 0 && sayı <= 9 && number != 3)
 	{
 		numbers[number] = sayı;
 		number = number + 1;
 		DelayMs(500);
 	}
-	//if hashtag pressed
+	// if hashtag pressed
 	if (sayı == 10 && number != 0)
 	{
 		int i;
@@ -187,54 +181,56 @@ void storenumber(int sayı)
 			ust = pow(10, number - i - 1);
 			count = count + numbers[i] * ust;
 		}
-		pwm_CCR_value = count*10;
-		//print the duty cycle using print function
-		char str[4] = "/0";
-		sprintf(str, "%d", pwm_CCR_value);
-		print("Duty Cycle: ");
-		print(str);
-		print("\n");
-		count=0;
+		pwm_CCR_value = count * 10;
+
+		count = 0;
 		number = 0;
 		numbers[0] = 0;
 		numbers[1] = 0;
 		numbers[2] = 0;
-
 	}
-
-
-
 }
-
-
+void printDutyCycle(uint8_t dutyCyclePercentage)
+{
+	// print the duty cycle using print function
+	char str[4] = "/0";
+	sprintf(str, "%d", dutyCyclePercentage);
+	print("Duty Cycle: ");
+	print(str);
+	print("\n");
+}
 
 void EXTI4_15_IRQHandler(void)
 {
 
 	if ((EXTI->RPR1 >> 4) & 1)
 	{ // Interrupt from PA4
-	    clearRowsKeypad();
+		clearRowsKeypad();
 
 		GPIOB->ODR ^= (1U << 4); // PB4
-		if ((GPIOA->IDR >> 4) & 1){
-		   storenumber(1);
-		   }
+		if ((GPIOA->IDR >> 4) & 1)
+		{
+			storenumber(1);
+		}
 		GPIOB->ODR ^= (1U << 4); // PB4
 
 		GPIOB->ODR ^= (1U << 5); // PB5
-		if ((GPIOA->IDR >> 4) & 1){
-		   storenumber(4);
-		   }
+		if ((GPIOA->IDR >> 4) & 1)
+		{
+			storenumber(4);
+		}
 		GPIOB->ODR ^= (1U << 5); // PB5
 
 		GPIOB->ODR ^= (1U << 6); // PB6
-		if ((GPIOA->IDR >> 4) & 1){
+		if ((GPIOA->IDR >> 4) & 1)
+		{
 			storenumber(7);
 		}
 		GPIOB->ODR ^= (1U << 6); // PB6
 
 		GPIOB->ODR ^= (1U << 7); // PB7
-		if ((GPIOA->IDR >> 4) & 1){
+		if ((GPIOA->IDR >> 4) & 1)
+		{
 			storenumber(11);
 		}
 		GPIOB->ODR ^= (1U << 7); // PB7
@@ -348,7 +344,6 @@ void EXTI4_15_IRQHandler(void)
 	}
 }
 
-
 void clearRowsKeypad(void)
 {
 	/*Clearing the rows*/
@@ -368,10 +363,18 @@ void setRowsKeypad(void)
 }
 void TIM2_IRQHandler(void)
 {
-    // update duty
+	// update duty
 	SetDutyCycle(pwm_CCR_value);
-    // Clear update status register
-    TIM2->SR &= ~(1U << 0);
+	// Clear update status register
+	TIM2->SR &= ~(1U << 0);
+}
+void TIM3_IRQHandler(void)
+{
+	// update duty
+	// print duty cycle
+	printDutyCycle(pwm_CCR_value / 10);
+	// Clear update status register
+	TIM3->SR &= ~(1U << 0);
 }
 
 /**
@@ -380,80 +383,101 @@ void TIM2_IRQHandler(void)
  */
 void init_pwm2(void)
 {
-    // zero out the control register just in case
-    TIM2->CR1 = 0;
+	// zero out the control register just in case
+	TIM2->CR1 = 0;
 
-    // Select PWM Mode 1
-    TIM2->CCMR1 |= (6U << 12);
-    // Preload Enable
-    TIM2->CCMR1 |= TIM_CCMR1_OC2PE;
+	// Select PWM Mode 1
+	TIM2->CCMR1 |= (6U << 12);
+	// Preload Enable
+	TIM2->CCMR1 |= TIM_CCMR1_OC2PE;
 
-    // Capture compare ch2 enable
-    TIM2->CCER |= TIM_CCER_CC2E;
+	// Capture compare ch2 enable
+	TIM2->CCER |= TIM_CCER_CC2E;
 
-    // zero out counter
-    TIM2->CNT = 0;
-    // 1 ms interrupt
-    //CLOCK/((PSC+1)* ARR)
-    TIM2->PSC = 15;
-    TIM2->ARR = 1000;
+	// zero out counter
+	TIM2->CNT = 0;
+	// 1 ms interrupt
+	// CLOCK/((PSC+1)* ARR)
+	TIM2->PSC = 15;
+	TIM2->ARR = 1000;
 
-    // zero out duty
-    TIM2->CCR2 = 0;
+	// zero out duty
+	TIM2->CCR2 = 0;
 
-    // Update interrupt enable
-    TIM2->DIER |= (1 << 0);
+	// Update interrupt enable
+	TIM2->DIER |= (1 << 0);
 
-    // TIM1 Enable
-    // TIM2->CR1 |= TIM_CR1_CEN;
+	// TIM1 Enable
+	// TIM2->CR1 |= TIM_CR1_CEN;
 
-    NVIC_SetPriority(TIM2_IRQn, 1);
-    NVIC_EnableIRQ(TIM2_IRQn);
+	NVIC_SetPriority(TIM2_IRQn, 1);
+	NVIC_EnableIRQ(TIM2_IRQn);
+}
+// Make TIM 3 for 2 second interrupt
+void Init_TIM3(void)
+{
+	// zero out the control register just in case
+	TIM3->CR1 = 0;
+
+	// zero out counter
+	TIM3->CNT = 0;
+	// 1 ms interrupt
+	// CLOCK/((PSC+1)* ARR)
+	TIM3->PSC = 15999;
+	TIM3->ARR = 2000;
+
+	// Update interrupt enable
+	TIM3->DIER |= (1 << 0);
+
+	// TIM1 Enable
+	TIM3->CR1 |= TIM_CR1_CEN;
+
+	NVIC_SetPriority(TIM3_IRQn, 2);
+	NVIC_EnableIRQ(TIM3_IRQn);
 }
 void StartPWM(void)
 {
-    // Enable the timer
-    TIM2->CR1 |= TIM_CR1_CEN;
+	// Enable the timer
+	TIM2->CR1 |= TIM_CR1_CEN;
 }
 
 void StopPWM(void)
 {
-    // Disable the timer
-    TIM2->CR1 &= ~TIM_CR1_CEN;
+	// Disable the timer
+	TIM2->CR1 &= ~TIM_CR1_CEN;
 }
 void SetDutyCycle(uint16_t dutyCycle)
 {
-    // Ensure duty cycle is within bounds
+	// Ensure duty cycle is within bounds
 
-    // Set the duty cycle by updating the CCR2 register
-    TIM2->CCR2 = dutyCycle;
-    TIM2->CCR1 = dutyCycle;
+	// Set the duty cycle by updating the CCR2 register
+	TIM2->CCR2 = dutyCycle;
+	TIM2->CCR1 = dutyCycle;
 }
 void increase_tick(void)
 {
-    tick++;
+	tick++;
 }
 void Init_Systick(uint32_t tick)
 {
-    SysTick->LOAD = tick; // Count down from 999 to 0
-    SysTick->VAL = 0;     // Clear current value
-    SysTick->CTRL = 0x7;  // Enable Systick, exception,and use processor clock
+	SysTick->LOAD = tick; // Count down from 999 to 0
+	SysTick->VAL = 0;	  // Clear current value
+	SysTick->CTRL = 0x7;  // Enable Systick, exception,and use processor clock
 }
 /**
  * @brief This function handles System tick timer.
  */
 void SysTick_Handler(void)
 {
-    increase_tick();
-
+	increase_tick();
 }
 void USART2_Init(void)
 {
 	// enable receive and transmit from USART2 module
 	USART2->CR1 |= (USART_CR1_RE | USART_CR1_TE);
 	// set baud rate to 9600 bps assuming clock is running at 16Mhz
-	//Baud Rate = APBxCLK / USARTx->BRR
-	USART2->BRR = 0x683;//1667
+	// Baud Rate = APBxCLK / USARTx->BRR
+	USART2->BRR = 0x683; // 1667
 	// enable uart module
 	USART2->CR1 |= USART_CR1_UE;
 }
@@ -485,4 +509,3 @@ void print(char *s)
 	}
 	_print(0, s, length);
 }
-
