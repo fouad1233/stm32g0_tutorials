@@ -5,7 +5,7 @@
 
 void clearRowsKeypad(void);
 void setRowsKeypad(void);
-void storenumber(int sayı);
+void storenumber(int digit);
 void RCC_Init(void);
 void GPIOA_Init(void);
 void GPIOB_Init(void);
@@ -77,6 +77,7 @@ void RCC_Init(void)
 	RCC->APBENR1 |= RCC_APBENR1_USART2EN;
 	// Enable TIM2 clock
 	RCC->APBENR1 |= RCC_APBENR1_TIM2EN;
+	RCC->APBENR1 |= RCC_APBENR1_TIM3EN;
 }
 
 void GPIOB_Init(void)
@@ -163,12 +164,12 @@ void DelayMs(uint32_t ms)
 	}
 }
 
-void storenumber(int sayı)
+void storenumber(int digit)
 {
-	DelayMs(500);
-	if (sayı >= 0 && sayı <= 9 && number != 3)
+	DelayMs(300);
+	if (digit >= 0 && digit <= 9 && number != 3)
 	{
-		numbers[number] = sayı;
+		numbers[number] = digit;
 		number = number + 1;
 	}
 	else if (number == 3)
@@ -180,7 +181,7 @@ void storenumber(int sayı)
 		numbers[2] = 0;
 	}
 	// if hashtag pressed
-	else if (sayı == 10 && number != 0)
+	else if (digit == 10 && number != 0)
 	{
 		int i;
 
@@ -205,7 +206,7 @@ void storenumber(int sayı)
 		numbers[1] = 0;
 		numbers[2] = 0;
 	}
-	else if (sayı == 11 && number != 0)
+	else if (digit == 11  )
 	{
 		count = 0;
 		number = 0;
@@ -214,6 +215,15 @@ void storenumber(int sayı)
 		numbers[2] = 0;
 		print("Undefined input charackter, please retry again\n");
 	}
+	else if (digit == 10  )
+		{
+			count = 0;
+			number = 0;
+			numbers[0] = 0;
+			numbers[1] = 0;
+			numbers[2] = 0;
+			print("Undefined input charackter, please retry again\n");
+		}
 }
 void printDutyCycle(uint8_t dutyCyclePercentage)
 {
