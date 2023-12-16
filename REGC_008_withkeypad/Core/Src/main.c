@@ -165,14 +165,22 @@ void DelayMs(uint32_t ms)
 
 void storenumber(int sayı)
 {
+	DelayMs(500);
 	if (sayı >= 0 && sayı <= 9 && number != 3)
 	{
 		numbers[number] = sayı;
 		number = number + 1;
-		DelayMs(500);
+	}
+	else if (number == 3)
+	{
+		print("You enter a number biger than 100, please retry again\n");
+		number = 0;
+		numbers[0] = 0;
+		numbers[1] = 0;
+		numbers[2] = 0;
 	}
 	// if hashtag pressed
-	if (sayı == 10 && number != 0)
+	else if (sayı == 10 && number != 0)
 	{
 		int i;
 
@@ -181,13 +189,30 @@ void storenumber(int sayı)
 			ust = pow(10, number - i - 1);
 			count = count + numbers[i] * ust;
 		}
-		pwm_CCR_value = count * 10;
-
+		if (count > 100)
+		{
+			print("You enter a number biger than 100, please retry again\n");
+		}
+		else
+		{
+			pwm_CCR_value = count * 10;
+			// print duty cycle
+			printDutyCycle(pwm_CCR_value / 10);
+		}
 		count = 0;
 		number = 0;
 		numbers[0] = 0;
 		numbers[1] = 0;
 		numbers[2] = 0;
+	}
+	else if (sayı == 11 && number != 0)
+	{
+		count = 0;
+		number = 0;
+		numbers[0] = 0;
+		numbers[1] = 0;
+		numbers[2] = 0;
+		print("Undefined input charackter, please retry again\n");
 	}
 }
 void printDutyCycle(uint8_t dutyCyclePercentage)
