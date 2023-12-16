@@ -5,11 +5,34 @@
 void clearRowsKeypad(void);
 void setRowsKeypad(void);
 void storenumber(int sayı);
+void RCC_Init(void);
+void GPIOA_Init(void);
+void GPIOB_Init(void);
+void EXTI_Init(void);
+void DelayMs(uint32_t ms);
+void EXTI4_15_IRQHandler(void);
+
 uint32_t number=0;// number of stored digits
 uint32_t count;	 // duty cycle rate
 uint32_t ust;
 uint8_t b;
 uint32_t numbers[3]; // store digit
+
+
+int main(void)
+{
+	RCC_Init();
+    GPIOB_Init();/*Set up PB4,PB5,PB6,PB7 as output row(output=01)*/
+	GPIOA_Init();/*Set up PA4,PA5,PA6,PA7 as input column(input=00)*/
+	EXTI_Init();
+	setRowsKeypad();/*Set all rows*/
+
+	while (1)
+	{
+
+	}
+	return 0;
+}
 
 
 void RCC_Init(void)
@@ -268,22 +291,6 @@ void EXTI4_15_IRQHandler(void)
 		setRowsKeypad();
 	}
 }
-
-int main(void)
-{
-	RCC_Init();
-    GPIOB_Init();/*Set up PB4,PB5,PB6,PB7 as output row(output=01)*/
-	GPIOA_Init();/*Set up PA4,PA5,PA6,PA7 as input column(input=00)*/
-	EXTI_Init();
-	setRowsKeypad();/*Set all rows*/
-
-	while (1)
-	{
-
-	}
-	return 0;
-}
-
 
 
 void clearRowsKeypad(void)

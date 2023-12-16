@@ -79,6 +79,7 @@ void init_pwm2(void)
     // zero out counter
     TIM2->CNT = 0;
     // 1 ms interrupt
+    //CLOCK/((PSC+1)* ARR)
     TIM2->PSC = 15;
     TIM2->ARR = 1000;
 
