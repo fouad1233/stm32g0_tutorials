@@ -1,6 +1,7 @@
 #include "stm32g0xx.h"
 #include <math.h>
 #include "main.h"
+#include <stdio.h>
 
 void clearRowsKeypad(void);
 void setRowsKeypad(void);
@@ -11,6 +12,10 @@ void GPIOB_Init(void);
 void EXTI_Init(void);
 void DelayMs(uint32_t ms);
 void EXTI4_15_IRQHandler(void);
+void USART2_Init(void);
+void printChar(uint8_t c);
+int _print(int f, char *ptr, int len);
+void print(char *s);
 
 uint32_t number=0;// number of stored digits
 uint32_t count;	 // duty cycle rate
@@ -49,6 +54,7 @@ int main(void)
 	setRowsKeypad();/*Set all rows*/
 	SetDutyCycle(0);
 	StartPWM();
+	USART2_Init();
 
 
 
@@ -70,6 +76,8 @@ void RCC_Init(void)
 	RCC->APBENR2 |= RCC_APBENR2_SYSCFGEN;
 	// Enables GPIOA peripheral
 	RCC->AHBENR |= 1;
+	//Enable usart2 clock
+	RCC->APBENR1 |= RCC_APBENR1_USART2EN;
 	// Enable TIM2 clock
 	RCC->APBENR1 |= RCC_APBENR1_TIM2EN;
 }
@@ -101,18 +109,23 @@ void GPIOB_Init(void){
 
 void GPIOA_Init(void){
 	/*Set up PA4,PA5,PA6,PA7 as input column(input=00)*/
-		GPIOA->MODER &= ~(3U << 8); /*for PA4*/
-		GPIOA->PUPDR |= (2U << 8);	/*Pull down mode*/
+	GPIOA->MODER &= ~(3U << 8); /*for PA4*/
+	GPIOA->PUPDR |= (2U << 8);	/*Pull down mode*/
 
-		GPIOA->MODER &= ~(3U << 10); /*for PA5*/
-		GPIOA->PUPDR |= (2U << 10);	 /*Pull down mode*/
+	GPIOA->MODER &= ~(3U << 10); /*for PA5*/
+	GPIOA->PUPDR |= (2U << 10);	 /*Pull down mode*/
 
-		GPIOA->MODER &= ~(3U << 12); /*for PA6*/
-		GPIOA->PUPDR |= (2U << 12);	 /*Pull down mode*/
+	GPIOA->MODER &= ~(3U << 12); /*for PA6*/
+	GPIOA->PUPDR |= (2U << 12);	 /*Pull down mode*/
 
-		GPIOA->MODER &= ~(3U << 14); /*for PA7*/
-		GPIOA->PUPDR |= (2U << 14);	 /*Pull down mode*/
+	GPIOA->MODER &= ~(3U << 14); /*for PA7*/
+	GPIOA->PUPDR |= (2U << 14);	 /*Pull down mode*/
 
+	// enable and setup pins PA2 and PA3 as alternate function for USART2 module
+	GPIOA->MODER &= ~(GPIO_MODER_MODE2 | GPIO_MODER_MODE3);
+	GPIOA->MODER |= (GPIO_MODER_MODE2_1 | GPIO_MODER_MODE3_1);
+	GPIOA->AFR[0] &= ~(GPIO_AFRL_AFSEL2 | GPIO_AFRL_AFSEL3);
+	GPIOA->AFR[0] |= (GPIO_AFRL_AFSEL2_0 | GPIO_AFRL_AFSEL3_0);
 }
 
 
@@ -175,6 +188,12 @@ void storenumber(int sayı)
 			count = count + numbers[i] * ust;
 		}
 		pwm_CCR_value = count*10;
+		//print the duty cycle using print function
+		char str[4] = "/0";
+		sprintf(str, "%d", pwm_CCR_value);
+		print("Duty Cycle: ");
+		print(str);
+		print("\n");
 		count=0;
 		number = 0;
 		numbers[0] = 0;
@@ -427,5 +446,43 @@ void SysTick_Handler(void)
 {
     increase_tick();
 
+}
+void USART2_Init(void)
+{
+	// enable receive and transmit from USART2 module
+	USART2->CR1 |= (USART_CR1_RE | USART_CR1_TE);
+	// set baud rate to 9600 bps assuming clock is running at 16Mhz
+	//Baud Rate = APBxCLK / USARTx->BRR
+	USART2->BRR = 0x683;//1667
+	// enable uart module
+	USART2->CR1 |= USART_CR1_UE;
+}
+void printChar(uint8_t c)
+{
+	// write c to the transmit data register
+	USART2->TDR = c;
+	// wait until transmit is complete
+	while (!(USART2->ISR & USART_ISR_TC))
+		;
+}
+int _print(int f, char *ptr, int len)
+{
+	(void)f; // don't do anthing with f
+	// call printChar within a for loop len times
+	for (int i = 0; i < len; i++)
+	{
+		printChar(ptr[i]);
+	}
+	return len; // return length
+}
+void print(char *s)
+{
+	// count number of characters in s string until a null byte comes `\0`
+	int length = 0;
+	while (s[length] != '\0')
+	{
+		length++;
+	}
+	_print(0, s, length);
 }
 
