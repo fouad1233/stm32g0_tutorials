@@ -18,14 +18,41 @@ uint32_t ust;
 uint8_t b;
 uint32_t numbers[3]; // store digit
 
+//pwm variables and prototpes
+void Init_Systick(uint32_t tick);
+void increase_tick(void);
+void TIM2_IRQHandler(void);
+void SetDutyCycle(uint16_t dutyCycle);
+void StartPWM(void);
+void StopPWM(void);
+void SysTick_Handler(void);
+void init_pwm2(void);
+
+// variables
+uint64_t tick;
+uint8_t seconds;
+uint16_t pwm_CCR_value = 0;
+uint8_t pwmDirection = 1; // 1 for increase, 0 for decrease
+
+// defines
+#define SYSTICK_FREQ 16000 // Khz
+
 
 int main(void)
 {
 	RCC_Init();
     GPIOB_Init();/*Set up PB4,PB5,PB6,PB7 as output row(output=01)*/
 	GPIOA_Init();/*Set up PA4,PA5,PA6,PA7 as input column(input=00)*/
+	Init_Systick(SYSTICK_FREQ);
+	init_pwm2();
 	EXTI_Init();
 	setRowsKeypad();/*Set all rows*/
+	SetDutyCycle(0);
+	StartPWM();
+
+
+
+
 
 	while (1)
 	{
@@ -43,22 +70,31 @@ void RCC_Init(void)
 	RCC->APBENR2 |= RCC_APBENR2_SYSCFGEN;
 	// Enables GPIOA peripheral
 	RCC->AHBENR |= 1;
+	// Enable TIM2 clock
+	RCC->APBENR1 |= RCC_APBENR1_TIM2EN;
 }
 
 void GPIOB_Init(void){
 	/*Set up PB4,PB5,PB6,PB7 as output row(output=01)*/
-		GPIOB->MODER &= ~(3U << 8);
-		GPIOB->MODER |= (1U << 8); /*for PB4*/
+	GPIOB->MODER &= ~(3U << 8);
+	GPIOB->MODER |= (1U << 8); /*for PB4*/
 
-		GPIOB->MODER &= ~(3U << 10);
-		GPIOB->MODER |= (1U << 10); /*for PB5*/
+	GPIOB->MODER &= ~(3U << 10);
+	GPIOB->MODER |= (1U << 10); /*for PB5*/
 
-		GPIOB->MODER &= ~(3U << 12);
-		GPIOB->MODER |= (1U << 12); /*for PB6*/
+	GPIOB->MODER &= ~(3U << 12);
+	GPIOB->MODER |= (1U << 12); /*for PB6*/
 
-		GPIOB->MODER &= ~(3U << 14);
-		GPIOB->MODER |= (1U << 14); /*for PB7*/
+	GPIOB->MODER &= ~(3U << 14);
+	GPIOB->MODER |= (1U << 14); /*for PB7*/
 
+	// Select AF from Moder
+	GPIOB->MODER &= ~(3U << 2 * 3);
+	GPIOB->MODER |= (2U << 2 * 3);
+
+	// Set alternate function to 2
+	// 3 comes from PB3
+	GPIOB->AFR[0] |= (2U << 4 * 3);
 }
 
 
@@ -128,7 +164,7 @@ void storenumber(int sayı)
 		number = number + 1;
 		DelayMs(500);
 	}
-
+	//if hashtag pressed
 	if (sayı == 10 && number != 0)
 	{
 		int i;
@@ -138,7 +174,8 @@ void storenumber(int sayı)
 			ust = pow(10, number - i - 1);
 			count = count + numbers[i] * ust;
 		}
-		//count=0;
+		pwm_CCR_value = count*10;
+		count=0;
 		number = 0;
 		numbers[0] = 0;
 		numbers[1] = 0;
@@ -310,3 +347,85 @@ void setRowsKeypad(void)
 	GPIOB->ODR |= (1U << 6); /*PB6*/
 	GPIOB->ODR |= (1U << 7); /*PB7*/
 }
+void TIM2_IRQHandler(void)
+{
+    // update duty
+	SetDutyCycle(pwm_CCR_value);
+    // Clear update status register
+    TIM2->SR &= ~(1U << 0);
+}
+
+/**
+ * Setup PWM output for
+ * TIM2 CH2 on PB3
+ */
+void init_pwm2(void)
+{
+    // zero out the control register just in case
+    TIM2->CR1 = 0;
+
+    // Select PWM Mode 1
+    TIM2->CCMR1 |= (6U << 12);
+    // Preload Enable
+    TIM2->CCMR1 |= TIM_CCMR1_OC2PE;
+
+    // Capture compare ch2 enable
+    TIM2->CCER |= TIM_CCER_CC2E;
+
+    // zero out counter
+    TIM2->CNT = 0;
+    // 1 ms interrupt
+    //CLOCK/((PSC+1)* ARR)
+    TIM2->PSC = 15;
+    TIM2->ARR = 1000;
+
+    // zero out duty
+    TIM2->CCR2 = 0;
+
+    // Update interrupt enable
+    TIM2->DIER |= (1 << 0);
+
+    // TIM1 Enable
+    // TIM2->CR1 |= TIM_CR1_CEN;
+
+    NVIC_SetPriority(TIM2_IRQn, 1);
+    NVIC_EnableIRQ(TIM2_IRQn);
+}
+void StartPWM(void)
+{
+    // Enable the timer
+    TIM2->CR1 |= TIM_CR1_CEN;
+}
+
+void StopPWM(void)
+{
+    // Disable the timer
+    TIM2->CR1 &= ~TIM_CR1_CEN;
+}
+void SetDutyCycle(uint16_t dutyCycle)
+{
+    // Ensure duty cycle is within bounds
+
+    // Set the duty cycle by updating the CCR2 register
+    TIM2->CCR2 = dutyCycle;
+    TIM2->CCR1 = dutyCycle;
+}
+void increase_tick(void)
+{
+    tick++;
+}
+void Init_Systick(uint32_t tick)
+{
+    SysTick->LOAD = tick; // Count down from 999 to 0
+    SysTick->VAL = 0;     // Clear current value
+    SysTick->CTRL = 0x7;  // Enable Systick, exception,and use processor clock
+}
+/**
+ * @brief This function handles System tick timer.
+ */
+void SysTick_Handler(void)
+{
+    increase_tick();
+
+}
+
