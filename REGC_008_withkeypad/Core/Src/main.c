@@ -166,11 +166,12 @@ void DelayMs(uint32_t ms)
 
 void storenumber(int digit)
 {
-	DelayMs(300);
+
 	if (digit >= 0 && digit <= 9 && number != 3)
 	{
 		numbers[number] = digit;
 		number = number + 1;
+		DelayMs(200);
 	}
 	else if (number == 3)
 	{
@@ -179,6 +180,7 @@ void storenumber(int digit)
 		numbers[0] = 0;
 		numbers[1] = 0;
 		numbers[2] = 0;
+		DelayMs(200);
 	}
 	// if hashtag pressed
 	else if (digit == 10 && number != 0)
@@ -205,6 +207,7 @@ void storenumber(int digit)
 		numbers[0] = 0;
 		numbers[1] = 0;
 		numbers[2] = 0;
+		DelayMs(200);
 	}
 	else if (digit == 11  )
 	{
@@ -214,6 +217,7 @@ void storenumber(int digit)
 		numbers[1] = 0;
 		numbers[2] = 0;
 		print("Undefined input charackter, please retry again\n");
+		DelayMs(200);
 	}
 	else if (digit == 10  )
 		{
@@ -223,6 +227,7 @@ void storenumber(int digit)
 			numbers[1] = 0;
 			numbers[2] = 0;
 			print("Undefined input charackter, please retry again\n");
+			DelayMs(200);
 		}
 }
 void printDutyCycle(uint8_t dutyCyclePercentage)
