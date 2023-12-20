@@ -90,8 +90,8 @@ void USART2_Init(void)
 	// enable receive and transmit from USART2 module
 	USART2->CR1 |= (USART_CR1_RE | USART_CR1_TE);
 	// set baud rate to 9600 bps assuming clock is running at 16Mhz
-	//Baud Rate = APBxCLK / USARTx->BRR
-	USART2->BRR = 0x683;//1667
+	// Baud Rate = APBxCLK / USARTx->BRR
+	USART2->BRR = 0x683; // 1667
 	// enable uart module
 	USART2->CR1 |= USART_CR1_UE;
 }
