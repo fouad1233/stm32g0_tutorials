@@ -8,7 +8,7 @@ implement a code that read from adc the value of the ldr and turn on the led if 
 */
 // define prototypes
 void RCC_init(void);
-void GPIOB_init(void);
+void GPIOA_init(void);
 void ADC_init(void);
 uint16_t poll_ADC(void);
 uint16_t adc_value;
@@ -16,7 +16,7 @@ int main(void)
 {
 	// Initialize the system
 	RCC_init();
-	GPIOB_init();
+	GPIOA_init();
 	ADC_init();
 	// Infinite loop
 	while (1)
@@ -34,18 +34,18 @@ void RCC_init(void)
 	RCC->APBENR2 |= RCC_APBENR2_ADCEN;
 }
 
-void GPIOB_init(void)
+void GPIOA_init(void)
 {
-	// Pb1 pin as input
-	GPIOB->MODER &= ~GPIO_MODER_MODE1;
+	// Pa0 pin as input
+	GPIOA->MODER &= ~GPIO_MODER_MODE0;
 	// Enable the adc mode
-	GPIOB->MODER |= (GPIO_MODER_MODE1_1 |GPIO_MODER_MODE1_0);
-	// Pb1 pin as push pull
-	GPIOB->OTYPER &= ~GPIO_OTYPER_OT1;
-	// Pb1 pin as high speed
-	GPIOB->OSPEEDR &= ~GPIO_OSPEEDR_OSPEED1;
-	// Pb1 pin as no pull up, no pull down
-	GPIOB->PUPDR &= ~GPIO_PUPDR_PUPD1;
+	GPIOA->MODER |= (GPIO_MODER_MODE0_1 | GPIO_MODER_MODE0_0);
+	// Pa0 pin as push pull
+	GPIOA->OTYPER &= ~GPIO_OTYPER_OT0;
+	// Pa0 pin as high speed
+	GPIOA->OSPEEDR &= ~GPIO_OSPEEDR_OSPEED0;
+	// Pa0 pin as no pull up, no pull down
+	GPIOA->PUPDR &= ~GPIO_PUPDR_PUPD1;
 }
 void ADC_init(void)
 {
@@ -69,7 +69,7 @@ void ADC_init(void)
 	while (!(ADC1->ISR & ADC_ISR_ADRDY))
 		;
 	// Select the ADC input channel
-	ADC1->CHSELR |= ADC_CHSELR_CHSEL9;
+	ADC1->CHSELR |= ADC_CHSELR_CHSEL0;
 }
 uint16_t poll_ADC(void)
 {
