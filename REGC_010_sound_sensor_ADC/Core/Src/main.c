@@ -51,16 +51,16 @@ void RCC_init(void)
 
 void GPIOA_init(void)
 {
-	// Pa0 pin as input
-	GPIOA->MODER &= ~GPIO_MODER_MODE0;
+	// Pa12 pin as input
+	GPIOA->MODER &= ~GPIO_MODER_MODE12;
 	// Enable the adc mode
-	GPIOA->MODER |= (GPIO_MODER_MODE0_1 | GPIO_MODER_MODE0_0);
-	// Pa0 pin as push pull
-	GPIOA->OTYPER &= ~GPIO_OTYPER_OT0;
-	// Pa0 pin as high speed
-	GPIOA->OSPEEDR &= ~GPIO_OSPEEDR_OSPEED0;
-	// Pa0 pin as no pull up, no pull down
-	GPIOA->PUPDR &= ~GPIO_PUPDR_PUPD1;
+	GPIOA->MODER |= (GPIO_MODER_MODE12_1 | GPIO_MODER_MODE12_0);
+	// Pa12 pin as push pull
+	GPIOA->OTYPER &= ~GPIO_OTYPER_OT12;
+	// Pa12 pin as high speed
+	GPIOA->OSPEEDR &= ~GPIO_OSPEEDR_OSPEED12;
+	// Pa12 pin as no pull up, no pull down
+	GPIOA->PUPDR &= ~GPIO_PUPDR_PUPD12;
 }
 void ADC_init(void)
 {
@@ -84,7 +84,7 @@ void ADC_init(void)
 	while (!(ADC1->ISR & ADC_ISR_ADRDY))
 		;
 	// Select the ADC input channel
-	ADC1->CHSELR |= ADC_CHSELR_CHSEL0;
+	ADC1->CHSELR |= ADC_CHSELR_CHSEL16;
 }
 uint16_t poll_ADC(void)
 {
