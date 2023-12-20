@@ -4,14 +4,28 @@
 #include <stdio.h>
 #include "stm32g031xx.h"
 /*
-implement a code that read from adc the value of the ldr and turn on the led if the value is less than 1000
+implemnt a code that read adc from pa0, convert it to voltage
+and detect a knock because this is a sound sensor
 */
+// defines
+#define VDDA 3.3
+#define ADC_MAX_VALUE 4095
+
 // define prototypes
 void RCC_init(void);
 void GPIOA_init(void);
 void ADC_init(void);
 uint16_t poll_ADC(void);
-uint16_t adc_value;
+static inline float convert_to_voltage(uint16_t adc_value);
+// variables
+
+typedef struct
+{
+	uint16_t adc_value;
+	float voltage;
+} sound_sensor;
+
+sound_sensor soundSensor;
 int main(void)
 {
 	// Initialize the system
@@ -22,14 +36,15 @@ int main(void)
 	while (1)
 	{
 		// Read the ADC converted value
-		adc_value = poll_ADC();
+		soundSensor.adc_value = poll_ADC();
+		// Convert adc value to voltage
+		soundSensor.voltage = convert_to_voltage(soundSensor.adc_value);
 	}
 	return 0;
 }
 void RCC_init(void)
 {
 	RCC->IOPENR |= RCC_IOPENR_GPIOAEN;
-	RCC->IOPENR |= RCC_IOPENR_GPIOBEN;
 	// Enable ADC clock
 	RCC->APBENR2 |= RCC_APBENR2_ADCEN;
 }
@@ -80,4 +95,9 @@ uint16_t poll_ADC(void)
 		;
 	// Read the ADC converted value
 	return ADC1->DR;
+}
+// Convert adc value to voltage
+static inline float convert_to_voltage(uint16_t adc_value)
+{
+	return (float)adc_value * VDDA / ADC_MAX_VALUE;
 }
