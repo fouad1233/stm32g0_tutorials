@@ -29,7 +29,7 @@ typedef struct
 	float voltage;
 } sound_sensor;
 
-char txbuffer[3] = "/0";
+char txbuffer[6] = "/0";
 
 sound_sensor soundSensor;
 int main(void)
@@ -38,6 +38,7 @@ int main(void)
 	RCC_init();
 	GPIOA_init();
 	ADC_init();
+	USART2_Init();
 	// Infinite loop
 	while (1)
 	{
@@ -47,6 +48,8 @@ int main(void)
 		soundSensor.voltage = convert_to_voltage(soundSensor.adc_value);
 		sprintf(txbuffer, "%d", soundSensor.adc_value);
 		print(txbuffer);
+		print("\n");
+
 
 	}
 	return 0;
