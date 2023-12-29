@@ -21,17 +21,31 @@ void printChar(uint8_t c);
 int _print(int f, char *ptr, int len);
 void print(char *s);
 static inline float convert_to_voltage(uint16_t adc_value);
-// variables
 
+//Systick functions prototypes
+void delay(volatile uint32_t);
+void Init_Systick(uint32_t tick);
+void Systick_Handler(void);
+void increase_tick(void);
+uint64_t getTick(void);
+void delay_ms(uint64_t msvalue);
+void SysTick_Handler(void);
+
+//Data types
 typedef struct
 {
 	uint16_t adc_value;
 	float voltage;
 } sound_sensor;
-
+// variables
 char txbuffer[6] = "/0";
+uint16_t tackCounter = 0;
 
 sound_sensor soundSensor;
+//systick variables
+uint64_t tick;
+
+
 int main(void)
 {
 	// Initialize the system
@@ -39,11 +53,16 @@ int main(void)
 	GPIOA_init();
 	ADC_init();
 	USART2_Init();
+	Init_Systick(16000);
 	// Infinite loop
 	while (1)
 	{
 		// Read the ADC converted value
 		soundSensor.adc_value = poll_ADC();
+		if (soundSensor.adc_value > 3000){
+			tackCounter++;
+			delay_ms(10);
+		}
 		// Convert adc value to voltage
 		soundSensor.voltage = convert_to_voltage(soundSensor.adc_value);
 		sprintf(txbuffer, "%d", soundSensor.adc_value);
@@ -167,4 +186,31 @@ void print(char *s)
 		length++;
 	}
 	_print(0, s, length);
+}
+
+void increase_tick(void){
+	tick++;
+
+}
+void Init_Systick(uint32_t tick){
+	SysTick->LOAD = tick; // Count down from 999 to 0
+	SysTick->VAL  = 0;   // Clear current value
+	SysTick->CTRL = 0x7; // Enable Systick, exception,and use processor clock
+}
+uint64_t getTick(void){
+	return tick;
+}
+void delay_ms(uint64_t msvalue){
+	uint64_t startTick =getTick() ;
+	while ((getTick() - startTick) < msvalue)
+	  {
+	  }
+
+}
+/**
+  * @brief This function handles System tick timer.
+  */
+void SysTick_Handler(void)
+{
+	increase_tick();
 }
