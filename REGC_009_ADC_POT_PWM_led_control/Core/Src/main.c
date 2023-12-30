@@ -106,7 +106,6 @@ void RCC_init(void)
 	RCC->IOPENR |= (1U << 1);
 	// Enable TIM2 clock
 	RCC->APBENR1 |= RCC_APBENR1_TIM2EN;
-	// Enable TIM2 clock for PWM pa 15
 }
 
 void GPIOA_init(void)
@@ -137,7 +136,7 @@ void GPIOA_init(void)
 	GPIOA->MODER &= ~(GPIO_MODER_MODE15);
 
 	// Select AF from Moder
-	GPIOA->MODER |= (GPIO_AFRH_AFSEL15_1);
+	GPIOA->MODER |= (GPIO_MODER_MODE15_1);
 }
 void GPIOB_init(void)
 {
