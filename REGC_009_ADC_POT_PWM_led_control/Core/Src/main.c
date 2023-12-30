@@ -10,19 +10,31 @@ and detect a knock because this is a sound sensor
 // defines
 #define VDDA 3.3
 #define ADC_MAX_VALUE 4095
+#define FULL_DUTY_CYCLE 1000
 
 // define prototypes
 void RCC_init(void);
 void GPIOA_init(void);
+void GPIOB_init(void);
 void ADC_init(void);
 uint16_t poll_ADC(void);
 void USART2_Init(void);
 void printChar(uint8_t c);
 int _print(int f, char *ptr, int len);
 void print(char *s);
-static inline float convert_to_voltage(uint16_t adc_value);
+float convert_to_voltage(uint16_t adc_value);
+/******PWM******/
+void PWM2_CH1_init(void);
+void PWM2_CH2_init(void);
+void PWM2_StartPWM(void);
+void PWM2_StopPWM(void);
+void PWM2_CH1_SetDutyCycle(uint16_t dutyCycle);
+void PWM2_CH2_SetDutyCycle(uint16_t dutyCycle);
+void TIM2_IRQHandler(void);
+uint16_t PWM2_CH1_calculate_Duty_cycle(uint16_t adcValue);
+uint16_t PWM2_CH2_calculate_Duty_cycle(uint16_t adcValue);
 
-//Systick functions prototypes
+// Systick functions prototypes
 void delay(volatile uint32_t);
 void Init_Systick(uint32_t tick);
 void Systick_Handler(void);
@@ -31,29 +43,38 @@ uint64_t getTick(void);
 void delay_ms(uint64_t msvalue);
 void SysTick_Handler(void);
 
-//Data types
+// Data types
 typedef struct
 {
 	uint16_t adc_value;
 	float voltage;
 } ADC_typedef;
+
 // variables
 char txbuffer[6] = "/0";
 uint16_t tackCounter = 0;
 
 ADC_typedef pot;
-//systick variables
+// systick variables
 uint64_t tick;
 
+/**********PWM Variables**********/
+uint16_t PWM2CH1dutyCycle;
+uint16_t PWM2CH2dutyCycle;
 
 int main(void)
 {
 	// Initialize the system
 	RCC_init();
 	GPIOA_init();
+	GPIOB_init();
 	ADC_init();
+	PWM2_CH1_init();
+	PWM2_CH2_init();
 	USART2_Init();
 	Init_Systick(16000);
+	PWM2_CH2_SetDutyCycle(0);
+	PWM2_StartPWM();
 	// Infinite loop
 	while (1)
 	{
@@ -61,11 +82,11 @@ int main(void)
 		pot.adc_value = poll_ADC();
 		// Convert adc value to voltage
 		pot.voltage = convert_to_voltage(pot.adc_value);
+		PWM2CH1dutyCycle = PWM2_CH1_calculate_Duty_cycle(pot.adc_value);
+		PWM2CH2dutyCycle = PWM2_CH2_calculate_Duty_cycle(pot.adc_value);
 		sprintf(txbuffer, "%d", pot.adc_value);
 		print(txbuffer);
 		print("\n");
-
-
 	}
 	return 0;
 }
@@ -79,6 +100,13 @@ void RCC_init(void)
 	// enable GPIOA and USART2 module clocks from RCC
 	RCC->IOPENR |= RCC_IOPENR_GPIOAEN;
 	RCC->APBENR1 |= RCC_APBENR1_USART2EN;
+
+	/***************PWM*****************/
+	// Enable GPIOB clock
+	RCC->IOPENR |= (1U << 1);
+	// Enable TIM2 clock
+	RCC->APBENR1 |= RCC_APBENR1_TIM2EN;
+	// Enable TIM2 clock for PWM pa 15
 }
 
 void GPIOA_init(void)
@@ -101,6 +129,25 @@ void GPIOA_init(void)
 	GPIOA->AFR[0] &= ~(GPIO_AFRL_AFSEL2 | GPIO_AFRL_AFSEL3);
 	GPIOA->AFR[0] |= (GPIO_AFRL_AFSEL2_0 | GPIO_AFRL_AFSEL3_0);
 
+	/***********PWM************/
+	// Set alternate function to 2
+	// 15 comes from PA15
+	GPIOA->AFR[1] |= (GPIO_AFRH_AFSEL15_1);
+	// Set pwm for PA15
+	GPIOA->MODER &= ~(GPIO_MODER_MODE15);
+
+	// Select AF from Moder
+	GPIOA->MODER |= (GPIO_AFRH_AFSEL15_1);
+}
+void GPIOB_init(void)
+{
+	/***********PWM************/
+	// Set alternate function to 2
+	// 3 comes from PB3
+	GPIOB->AFR[0] |= (GPIO_AFRL_AFSEL3_1);
+	// Select AF from Moder
+	GPIOB->MODER &= ~(GPIO_MODER_MODE3);
+	GPIOB->MODER |= (GPIO_MODER_MODE3_1);
 }
 void ADC_init(void)
 {
@@ -147,13 +194,150 @@ uint16_t poll_ADC(void)
 	// Read the ADC converted value
 	return ADC1->DR;
 }
+
 // Convert adc value to voltage
-static inline float convert_to_voltage(uint16_t adc_value)
+float convert_to_voltage(uint16_t adc_value)
 {
 	return (float)adc_value * VDDA / ADC_MAX_VALUE;
 }
 
-//Uart functions
+/*********PWM***********/
+
+void TIM2_IRQHandler(void)
+{
+
+	// update duty
+	PWM2_CH1_SetDutyCycle(PWM2CH1dutyCycle);
+	PWM2_CH2_SetDutyCycle(PWM2CH2dutyCycle);
+
+	// Clear update status register
+	TIM2->SR &= ~(1U << 0);
+}
+
+void PWM2_CH1_init(void)
+{
+	// zero out the control register just in case
+	TIM2->CR1 = 0;
+
+	// Select PWM Mode 1
+	TIM2->CCMR1 |= TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2;
+	// Preload Enable
+	TIM2->CCMR1 |= TIM_CCMR1_OC1PE;
+
+	// Capture compare ch1 enable
+	TIM2->CCER |= TIM_CCER_CC1E;
+
+	// zero out counter
+	TIM2->CNT = 0;
+	// 1 ms interrupt
+	// CLOCK/((PSC+1)* ARR)
+	TIM2->PSC = 15;
+	TIM2->ARR = 1000;
+
+	// zero out duty
+	TIM2->CCR1 = 0;
+
+	// Update interrupt enable
+	TIM2->DIER |= (1 << 0);
+
+	// TIM1 Enable
+	// TIM2->CR1 |= TIM_CR1_CEN;
+
+	NVIC_SetPriority(TIM2_IRQn, 1);
+	NVIC_EnableIRQ(TIM2_IRQn);
+}
+
+/*
+ * Setup PWM output for
+ * TIM2 CH2 on PB3
+ */
+void PWM2_CH2_init(void)
+{
+	// zero out the control register just in case
+	TIM2->CR1 = 0;
+
+	// Select PWM Mode 1
+	TIM2->CCMR1 |= (6U << 12);
+	// Preload Enable
+	TIM2->CCMR1 |= TIM_CCMR1_OC2PE;
+
+	// Capture compare ch2 enable
+	TIM2->CCER |= TIM_CCER_CC2E;
+
+	// zero out counter
+	TIM2->CNT = 0;
+	// 1 ms interrupt
+	// CLOCK/((PSC+1)* ARR)
+	TIM2->PSC = 15;
+	TIM2->ARR = 1000;
+
+	// zero out duty
+	TIM2->CCR2 = 0;
+
+	// Update interrupt enable
+	TIM2->DIER |= (1 << 0);
+
+	// TIM1 Enable
+	// TIM2->CR1 |= TIM_CR1_CEN;
+
+	NVIC_SetPriority(TIM2_IRQn, 1);
+	NVIC_EnableIRQ(TIM2_IRQn);
+}
+void PWM2_StartPWM(void)
+{
+	// Enable the timer
+	TIM2->CR1 |= TIM_CR1_CEN;
+}
+
+void PWM2_StopPWM(void)
+{
+	// Disable the timer
+	TIM2->CR1 &= ~TIM_CR1_CEN;
+}
+void PWM2_CH1_SetDutyCycle(uint16_t dutyCycle)
+{
+	// Ensure duty cycle is within bounds
+	// Set the duty cycle by updating the CCR1 register
+	TIM2->CCR1 = dutyCycle;
+}
+void PWM2_CH2_SetDutyCycle(uint16_t dutyCycle)
+{
+	// Ensure duty cycle is within bounds
+	// Set the duty cycle by updating the CCR2 register
+	TIM2->CCR2 = dutyCycle;
+}
+
+uint16_t PWM2_CH1_calculate_Duty_cycle(uint16_t adcValue)
+{
+	uint16_t dutyCycle = 0;
+
+	if (adcValue < (ADC_MAX_VALUE / 2))
+	{
+		dutyCycle = 0;
+	}
+	else
+	{
+		dutyCycle = (uint16_t)round((((float)(adcValue * 2 - ADC_MAX_VALUE)) / ADC_MAX_VALUE) * FULL_DUTY_CYCLE);
+	}
+	return dutyCycle;
+}
+// calculate duty cycle for the first led near the ground
+uint16_t PWM2_CH2_calculate_Duty_cycle(uint16_t adcValue)
+{
+	uint16_t dutyCycle = 0;
+
+	if (adcValue > (ADC_MAX_VALUE / 2))
+	{
+		dutyCycle = 0;
+	}
+	else
+	{
+		dutyCycle = FULL_DUTY_CYCLE - (uint16_t)round((((float)adcValue * 2) / ADC_MAX_VALUE) * FULL_DUTY_CYCLE);
+	}
+	return dutyCycle;
+}
+
+/*********Uart functions***********/
 
 void printChar(uint8_t c)
 {
@@ -184,28 +368,30 @@ void print(char *s)
 	_print(0, s, length);
 }
 
-void increase_tick(void){
+void increase_tick(void)
+{
 	tick++;
-
 }
-void Init_Systick(uint32_t tick){
+void Init_Systick(uint32_t tick)
+{
 	SysTick->LOAD = tick; // Count down from 999 to 0
-	SysTick->VAL  = 0;   // Clear current value
-	SysTick->CTRL = 0x7; // Enable Systick, exception,and use processor clock
+	SysTick->VAL = 0;	  // Clear current value
+	SysTick->CTRL = 0x7;  // Enable Systick, exception,and use processor clock
 }
-uint64_t getTick(void){
+uint64_t getTick(void)
+{
 	return tick;
 }
-void delay_ms(uint64_t msvalue){
-	uint64_t startTick =getTick() ;
+void delay_ms(uint64_t msvalue)
+{
+	uint64_t startTick = getTick();
 	while ((getTick() - startTick) < msvalue)
-	  {
-	  }
-
+	{
+	}
 }
 /**
-  * @brief This function handles System tick timer.
-  */
+ * @brief This function handles System tick timer.
+ */
 void SysTick_Handler(void)
 {
 	increase_tick();
