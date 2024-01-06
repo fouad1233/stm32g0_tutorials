@@ -1,6 +1,9 @@
 #include "stm32g0xx.h"
 #include "stm32g031xx.h"
+#include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
+
 #define MPU6050_ADDRESS 0x68
 
 #define MPU6050_WHO_AM_I 0x75
@@ -26,19 +29,10 @@
 #define MPU6050_GYRO_ZOUT_H 0x47
 #define MPU6050_GYRO_ZOUT_L 0x48
 
-void GPIO_Init(void);
-void I2C_Config(void);
-uint8_t I2C_Read(uint8_t, uint8_t);
-void I2C_Write(uint8_t devAddr, uint8_t regAddr, uint8_t data);
-void delay_ms(uint32_t ms);
-
-int16_t data;
-int16_t accelx;
-int16_t gyrox;
-int16_t accely;
-int16_t gyroy;
-int16_t accelz;
-int16_t gyroz;
+#define SMOOTHING_FACTOR 0.001
+#define KNOCK_THRESHOLD 20
+#define TIMERPSC 16000
+#define TIMERPERIYOD 100
 
 typedef struct
 {
@@ -48,13 +42,48 @@ typedef struct
 	float gyrox;
 	float gyroy;
 	float gyroz;
+
+	float accelx_smooth;
+	float accely_smooth;
+	float accelz_smooth;
+	float gyrox_smooth;
+	float gyroy_smooth;
+	float gyroz_smooth;
 } MPU6050;
+
+void GPIO_Init(void);
+void I2C_Config(void);
+uint8_t I2C_Read(uint8_t, uint8_t);
+void I2C_Write(uint8_t devAddr, uint8_t regAddr, uint8_t data);
+void delay_ms(uint32_t ms);
+uint8_t detect_knock(MPU6050 sensorData);
+
+void TIM2_Clock_Init(void);
+void TIM2_Interrupt_Config(void);
+void TIM2_IRQHandler(void);
+void Start_TIM2(void);
+void Stop_TIM2(void);
+
+int16_t data;
+int16_t accelx;
+int16_t gyrox;
+int16_t accely;
+int16_t gyroy;
+int16_t accelz;
+int16_t gyroz;
+
+uint16_t knock_num;
+uint8_t timerFlag;
+
 MPU6050 sensorData;
 
 int main(void)
 {
 	I2C_Config();
 	GPIO_Init();
+	TIM2_Clock_Init();
+	TIM2_Interrupt_Config();
+	Start_TIM2();
 
 	data = I2C_Read(MPU6050_ADDRESS, MPU6050_WHO_AM_I);
 	data = I2C_Read(MPU6050_ADDRESS, MPU6050_POWER_MGMT_1);
@@ -68,28 +97,41 @@ int main(void)
 		accelx = I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_XOUT_L);
 		accelx = accelx | (I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_XOUT_H) << 8);
 		sensorData.accelx = (float)(accelx) / 16384;
+		sensorData.accelx_smooth += SMOOTHING_FACTOR * (sensorData.accelx - sensorData.accelx_smooth);
 
 		accely = I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_YOUT_L);
 		accely = accely | (I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_YOUT_H) << 8);
 		sensorData.accely = (float)(accely) / 16384;
+		sensorData.accely_smooth += SMOOTHING_FACTOR * (sensorData.accely - sensorData.accely_smooth);
 
 		accelz = I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_ZOUT_L);
 		accelz = accelz | (I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_ZOUT_H) << 8);
 		sensorData.accelz = (float)(accelz) / 16384;
-
+		sensorData.accelz_smooth += SMOOTHING_FACTOR * (sensorData.accelz - sensorData.accelz_smooth);
 
 		gyrox = I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_XOUT_L);
 		gyrox = gyrox | (I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_XOUT_H) << 8);
 		sensorData.gyrox = (float)(gyrox) / 131;
+		sensorData.gyrox_smooth += SMOOTHING_FACTOR * (sensorData.gyrox - sensorData.gyrox_smooth);
 
 		gyroy = I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_YOUT_L);
 		gyroy = gyroy | (I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_YOUT_H) << 8);
 		sensorData.gyroy = (float)(gyroy) / 131;
+		sensorData.gyroy_smooth += SMOOTHING_FACTOR * (sensorData.gyroy - sensorData.gyroy_smooth);
 
 		gyroz = I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_ZOUT_L);
 		gyroz = gyroz | (I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_ZOUT_H) << 8);
 		sensorData.gyroz = (float)(gyroz) / 131;
-		delay_ms(1);
+		sensorData.gyroz_smooth += SMOOTHING_FACTOR * (sensorData.gyroz - sensorData.gyroz_smooth);
+
+		if (timerFlag)
+		{
+			if (detect_knock(sensorData)){
+				knock_num += detect_knock(sensorData);
+				TIM2->CNT = 0;
+				timerFlag = 0;
+			}
+		}
 	}
 }
 
@@ -187,5 +229,55 @@ void delay_ms(uint32_t ms)
 {
 	for (uint32_t i = 0; i < ms * 1000; i++)
 	{ // only wait
+	}
+}
+
+uint8_t detect_knock(MPU6050 sensorData)
+{
+	if (abs(sensorData.gyrox - sensorData.gyrox_smooth) > KNOCK_THRESHOLD || abs(sensorData.gyrox - sensorData.gyroy_smooth) > KNOCK_THRESHOLD || abs(sensorData.gyroz - sensorData.gyroz_smooth) > KNOCK_THRESHOLD)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+void TIM2_Clock_Init(void)
+{
+	// Enable TIM2 clock
+	RCC->APBENR1 |= RCC_APBENR1_TIM2EN;
+
+	// Set TIM2 prescaler and period
+	TIM2->PSC = TIMERPSC - 1;
+	TIM2->CNT = 0;
+	TIM2->ARR = TIMERPERIYOD - 1;
+}
+void TIM2_Interrupt_Config(void)
+{
+	NVIC_SetPriority(TIM2_IRQn, 15);
+	NVIC_EnableIRQ(TIM2_IRQn);
+	// Update interrupt enable
+	TIM2->DIER |= TIM_DIER_UIE;
+}
+
+void Start_TIM2(void)
+{
+	// Start TIM2
+	TIM2->CR1 |= TIM_CR1_CEN;
+}
+void Stop_TIM2(void)
+{
+	// Stop TIM2
+	TIM2->CR1 &= ~TIM_CR1_CEN;
+}
+void TIM2_IRQHandler(void)
+{
+	if (TIM2->SR & TIM_SR_UIF)
+	{
+		// Code here
+		timerFlag =1;
+		// Clear the interrupt flag
+		TIM2->SR &= ~TIM_SR_UIF;
 	}
 }
