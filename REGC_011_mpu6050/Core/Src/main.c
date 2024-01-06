@@ -63,6 +63,7 @@ void TIM3_Interrupt_Config(void);
 void TIM3_IRQHandler(void);
 void Start_TIM3(void);
 void Stop_TIM3(void);
+void IMU_sensor_read(void);
 
 int16_t data;
 int16_t accelx;
@@ -93,36 +94,7 @@ int main(void)
 
 	while (1)
 	{
-
-		accelx = I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_XOUT_L);
-		accelx = accelx | (I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_XOUT_H) << 8);
-		sensorData.accelx = (float)(accelx) / 16384;
-		sensorData.accelx_smooth += SMOOTHING_FACTOR * (sensorData.accelx - sensorData.accelx_smooth);
-
-		accely = I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_YOUT_L);
-		accely = accely | (I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_YOUT_H) << 8);
-		sensorData.accely = (float)(accely) / 16384;
-		sensorData.accely_smooth += SMOOTHING_FACTOR * (sensorData.accely - sensorData.accely_smooth);
-
-		accelz = I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_ZOUT_L);
-		accelz = accelz | (I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_ZOUT_H) << 8);
-		sensorData.accelz = (float)(accelz) / 16384;
-		sensorData.accelz_smooth += SMOOTHING_FACTOR * (sensorData.accelz - sensorData.accelz_smooth);
-
-		gyrox = I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_XOUT_L);
-		gyrox = gyrox | (I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_XOUT_H) << 8);
-		sensorData.gyrox = (float)(gyrox) / 131;
-		sensorData.gyrox_smooth += SMOOTHING_FACTOR * (sensorData.gyrox - sensorData.gyrox_smooth);
-
-		gyroy = I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_YOUT_L);
-		gyroy = gyroy | (I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_YOUT_H) << 8);
-		sensorData.gyroy = (float)(gyroy) / 131;
-		sensorData.gyroy_smooth += SMOOTHING_FACTOR * (sensorData.gyroy - sensorData.gyroy_smooth);
-
-		gyroz = I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_ZOUT_L);
-		gyroz = gyroz | (I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_ZOUT_H) << 8);
-		sensorData.gyroz = (float)(gyroz) / 131;
-		sensorData.gyroz_smooth += SMOOTHING_FACTOR * (sensorData.gyroz - sensorData.gyroz_smooth);
+		IMU_sensor_read();
 
 		if (timerFlag)
 		{
@@ -276,4 +248,37 @@ void TIM3_IRQHandler(void)
 		// Clear the interrupt flag
 		TIM3->SR &= ~TIM_SR_UIF;
 	}
+}
+void IMU_sensor_read(void){
+
+	accelx = I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_XOUT_L);
+	accelx = accelx | (I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_XOUT_H) << 8);
+	sensorData.accelx = (float)(accelx) / 16384;
+	sensorData.accelx_smooth += SMOOTHING_FACTOR * (sensorData.accelx - sensorData.accelx_smooth);
+
+	accely = I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_YOUT_L);
+	accely = accely | (I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_YOUT_H) << 8);
+	sensorData.accely = (float)(accely) / 16384;
+	sensorData.accely_smooth += SMOOTHING_FACTOR * (sensorData.accely - sensorData.accely_smooth);
+
+	accelz = I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_ZOUT_L);
+	accelz = accelz | (I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_ZOUT_H) << 8);
+	sensorData.accelz = (float)(accelz) / 16384;
+	sensorData.accelz_smooth += SMOOTHING_FACTOR * (sensorData.accelz - sensorData.accelz_smooth);
+
+	gyrox = I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_XOUT_L);
+	gyrox = gyrox | (I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_XOUT_H) << 8);
+	sensorData.gyrox = (float)(gyrox) / 131;
+	sensorData.gyrox_smooth += SMOOTHING_FACTOR * (sensorData.gyrox - sensorData.gyrox_smooth);
+
+	gyroy = I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_YOUT_L);
+	gyroy = gyroy | (I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_YOUT_H) << 8);
+	sensorData.gyroy = (float)(gyroy) / 131;
+	sensorData.gyroy_smooth += SMOOTHING_FACTOR * (sensorData.gyroy - sensorData.gyroy_smooth);
+
+	gyroz = I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_ZOUT_L);
+	gyroz = gyroz | (I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_ZOUT_H) << 8);
+	sensorData.gyroz = (float)(gyroz) / 131;
+	sensorData.gyroz_smooth += SMOOTHING_FACTOR * (sensorData.gyroz - sensorData.gyroz_smooth);
+
 }
