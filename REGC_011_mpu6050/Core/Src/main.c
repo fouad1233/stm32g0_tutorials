@@ -58,11 +58,11 @@ void I2C_Write(uint8_t devAddr, uint8_t regAddr, uint8_t data);
 void delay_ms(uint32_t ms);
 uint8_t detect_knock(MPU6050 sensorData);
 
-void TIM2_Clock_Init(void);
-void TIM2_Interrupt_Config(void);
-void TIM2_IRQHandler(void);
-void Start_TIM2(void);
-void Stop_TIM2(void);
+void TIM3_Clock_Init(void);
+void TIM3_Interrupt_Config(void);
+void TIM3_IRQHandler(void);
+void Start_TIM3(void);
+void Stop_TIM3(void);
 
 int16_t data;
 int16_t accelx;
@@ -81,9 +81,9 @@ int main(void)
 {
 	I2C_Config();
 	GPIO_Init();
-	TIM2_Clock_Init();
-	TIM2_Interrupt_Config();
-	Start_TIM2();
+	TIM3_Clock_Init();
+	TIM3_Interrupt_Config();
+	Start_TIM3();
 
 	data = I2C_Read(MPU6050_ADDRESS, MPU6050_WHO_AM_I);
 	data = I2C_Read(MPU6050_ADDRESS, MPU6050_POWER_MGMT_1);
@@ -126,9 +126,10 @@ int main(void)
 
 		if (timerFlag)
 		{
-			if (detect_knock(sensorData)){
+			if (detect_knock(sensorData))
+			{
 				knock_num += detect_knock(sensorData);
-				TIM2->CNT = 0;
+				TIM3->CNT = 0;
 				timerFlag = 0;
 			}
 		}
@@ -243,41 +244,41 @@ uint8_t detect_knock(MPU6050 sensorData)
 		return 0;
 	}
 }
-void TIM2_Clock_Init(void)
+void TIM3_Clock_Init(void)
 {
-	// Enable TIM2 clock
-	RCC->APBENR1 |= RCC_APBENR1_TIM2EN;
+	// Enable TIM3 clock
+	RCC->APBENR1 |= RCC_APBENR1_TIM3EN;
 
-	// Set TIM2 prescaler and period
-	TIM2->PSC = TIMERPSC - 1;
-	TIM2->CNT = 0;
-	TIM2->ARR = TIMERPERIYOD - 1;
+	// Set TIM3 prescaler and period
+	TIM3->PSC = TIMERPSC - 1;
+	TIM3->CNT = 0;
+	TIM3->ARR = TIMERPERIYOD - 1;
 }
-void TIM2_Interrupt_Config(void)
+void TIM3_Interrupt_Config(void)
 {
-	NVIC_SetPriority(TIM2_IRQn, 15);
-	NVIC_EnableIRQ(TIM2_IRQn);
+	NVIC_SetPriority(TIM3_IRQn, 15);
+	NVIC_EnableIRQ(TIM3_IRQn);
 	// Update interrupt enable
-	TIM2->DIER |= TIM_DIER_UIE;
+	TIM3->DIER |= TIM_DIER_UIE;
 }
 
-void Start_TIM2(void)
+void Start_TIM3(void)
 {
-	// Start TIM2
-	TIM2->CR1 |= TIM_CR1_CEN;
+	// Start TIM3
+	TIM3->CR1 |= TIM_CR1_CEN;
 }
-void Stop_TIM2(void)
+void Stop_TIM3(void)
 {
-	// Stop TIM2
-	TIM2->CR1 &= ~TIM_CR1_CEN;
+	// Stop TIM3
+	TIM3->CR1 &= ~TIM_CR1_CEN;
 }
-void TIM2_IRQHandler(void)
+void TIM3_IRQHandler(void)
 {
-	if (TIM2->SR & TIM_SR_UIF)
+	if (TIM3->SR & TIM_SR_UIF)
 	{
 		// Code here
-		timerFlag =1;
+		timerFlag = 1;
 		// Clear the interrupt flag
-		TIM2->SR &= ~TIM_SR_UIF;
+		TIM3->SR &= ~TIM_SR_UIF;
 	}
 }

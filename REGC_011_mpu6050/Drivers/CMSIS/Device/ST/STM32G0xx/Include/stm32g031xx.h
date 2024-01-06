@@ -89,7 +89,7 @@ typedef enum
   ADC1_IRQn                   = 12,     /*!< ADC1 Interrupts                                                   */
   TIM1_BRK_UP_TRG_COM_IRQn    = 13,     /*!< TIM1 Break, Update, Trigger and Commutation Interrupts            */
   TIM1_CC_IRQn                = 14,     /*!< TIM1 Capture Compare Interrupt                                    */
-  TIM2_IRQn                   = 15,     /*!< TIM2 Interrupt                                                    */
+  TIM2_IRQn                   = 15,     /*!< TIM3 Interrupt                                                    */
   TIM3_IRQn                   = 16,     /*!< TIM3 global Interrupt                                             */
   LPTIM1_IRQn                 = 17,     /*!< LPTIM1 global Interrupts                                          */
   LPTIM2_IRQn                 = 18,     /*!< LPTIM2 global Interrupt                                           */
@@ -7658,7 +7658,7 @@ typedef struct
 
 /****************** TIM Instances : All supported instances *******************/
 #define IS_TIM_INSTANCE(INSTANCE)       (((INSTANCE) == TIM1)   || \
-                                         ((INSTANCE) == TIM2)   || \
+                                         ((INSTANCE) == TIM3)   || \
                                          ((INSTANCE) == TIM3)   || \
                                          ((INSTANCE) == TIM14)  || \
                                          ((INSTANCE) == TIM16)  || \
@@ -7682,7 +7682,7 @@ typedef struct
 
 /************* TIM Instances : at least 1 capture/compare channel *************/
 #define IS_TIM_CC1_INSTANCE(INSTANCE)   (((INSTANCE) == TIM1)   || \
-                                         ((INSTANCE) == TIM2)   || \
+                                         ((INSTANCE) == TIM3)   || \
                                          ((INSTANCE) == TIM3)   || \
                                          ((INSTANCE) == TIM14)  || \
                                          ((INSTANCE) == TIM16)  || \
@@ -7690,17 +7690,17 @@ typedef struct
 
 /************ TIM Instances : at least 2 capture/compare channels *************/
 #define IS_TIM_CC2_INSTANCE(INSTANCE)   (((INSTANCE) == TIM1)   || \
-                                         ((INSTANCE) == TIM2)   || \
+                                         ((INSTANCE) == TIM3)   || \
                                          ((INSTANCE) == TIM3))
 
 /************ TIM Instances : at least 3 capture/compare channels *************/
 #define IS_TIM_CC3_INSTANCE(INSTANCE)   (((INSTANCE) == TIM1)   || \
-                                         ((INSTANCE) == TIM2)   || \
+                                         ((INSTANCE) == TIM3)   || \
                                          ((INSTANCE) == TIM3))
 
 /************ TIM Instances : at least 4 capture/compare channels *************/
 #define IS_TIM_CC4_INSTANCE(INSTANCE)   (((INSTANCE) == TIM1)   || \
-                                         ((INSTANCE) == TIM2)   || \
+                                         ((INSTANCE) == TIM3)   || \
                                          ((INSTANCE) == TIM3))
 
 /****************** TIM Instances : at least 5 capture/compare channels *******/
@@ -7716,14 +7716,14 @@ typedef struct
 
 /****************** TIM Instances : DMA requests generation (TIMx_DIER.UDE) ***/
 #define IS_TIM_DMA_INSTANCE(INSTANCE)      (((INSTANCE) == TIM1)   || \
-                                            ((INSTANCE) == TIM2)   || \
+                                            ((INSTANCE) == TIM3)   || \
                                             ((INSTANCE) == TIM3)   || \
                                             ((INSTANCE) == TIM16)  || \
                                             ((INSTANCE) == TIM17))
 
 /************ TIM Instances : DMA requests generation (TIMx_DIER.CCxDE) *******/
 #define IS_TIM_DMA_CC_INSTANCE(INSTANCE)   (((INSTANCE) == TIM1)   || \
-                                            ((INSTANCE) == TIM2)   || \
+                                            ((INSTANCE) == TIM3)   || \
                                             ((INSTANCE) == TIM3)   || \
                                             ((INSTANCE) == TIM14)  || \
                                             ((INSTANCE) == TIM16)  || \
@@ -7731,7 +7731,7 @@ typedef struct
 
 /******************** TIM Instances : DMA burst feature ***********************/
 #define IS_TIM_DMABURST_INSTANCE(INSTANCE) (((INSTANCE) == TIM1)   || \
-                                            ((INSTANCE) == TIM2)   || \
+                                            ((INSTANCE) == TIM3)   || \
                                             ((INSTANCE) == TIM3)   || \
                                             ((INSTANCE) == TIM16)  || \
                                             ((INSTANCE) == TIM17))
@@ -7746,7 +7746,7 @@ typedef struct
       ((CHANNEL) == TIM_CHANNEL_5) ||          \
       ((CHANNEL) == TIM_CHANNEL_6)))           \
      ||                                        \
-     (((INSTANCE) == TIM2) &&                  \
+     (((INSTANCE) == TIM3) &&                  \
      (((CHANNEL) == TIM_CHANNEL_1) ||          \
       ((CHANNEL) == TIM_CHANNEL_2) ||          \
       ((CHANNEL) == TIM_CHANNEL_3) ||          \
@@ -7782,7 +7782,7 @@ typedef struct
 
 /****************** TIM Instances : supporting clock division *****************/
 #define IS_TIM_CLOCK_DIVISION_INSTANCE(INSTANCE)   (((INSTANCE) == TIM1)    || \
-                                                    ((INSTANCE) == TIM2)    || \
+                                                    ((INSTANCE) == TIM3)    || \
                                                     ((INSTANCE) == TIM3)    || \
                                                     ((INSTANCE) == TIM14)   || \
                                                     ((INSTANCE) == TIM16)   || \
@@ -7790,22 +7790,22 @@ typedef struct
 
 /****** TIM Instances : supporting external clock mode 1 for ETRF input *******/
 #define IS_TIM_CLOCKSOURCE_ETRMODE1_INSTANCE(INSTANCE) (((INSTANCE) == TIM1) || \
-                                                        ((INSTANCE) == TIM2) || \
+                                                        ((INSTANCE) == TIM3) || \
                                                         ((INSTANCE) == TIM3))
 
 /****** TIM Instances : supporting external clock mode 2 for ETRF input *******/
 #define IS_TIM_CLOCKSOURCE_ETRMODE2_INSTANCE(INSTANCE) (((INSTANCE) == TIM1) || \
-                                                        ((INSTANCE) == TIM2) || \
+                                                        ((INSTANCE) == TIM3) || \
                                                         ((INSTANCE) == TIM3))
 
 /****************** TIM Instances : supporting external clock mode 1 for TIX inputs*/
 #define IS_TIM_CLOCKSOURCE_TIX_INSTANCE(INSTANCE)      (((INSTANCE) == TIM1) || \
-                                                        ((INSTANCE) == TIM2) || \
+                                                        ((INSTANCE) == TIM3) || \
                                                         ((INSTANCE) == TIM3))
 
 /****************** TIM Instances : supporting internal trigger inputs(ITRX) *******/
 #define IS_TIM_CLOCKSOURCE_ITRX_INSTANCE(INSTANCE)     (((INSTANCE) == TIM1) || \
-                                                        ((INSTANCE) == TIM2) || \
+                                                        ((INSTANCE) == TIM3) || \
                                                         ((INSTANCE) == TIM3))
 
 /****************** TIM Instances : supporting combined 3-phase PWM mode ******/
@@ -7818,52 +7818,52 @@ typedef struct
 
 /****************** TIM Instances : supporting counting mode selection ********/
 #define IS_TIM_COUNTER_MODE_SELECT_INSTANCE(INSTANCE)  (((INSTANCE) == TIM1) || \
-                                                        ((INSTANCE) == TIM2) || \
+                                                        ((INSTANCE) == TIM3) || \
                                                         ((INSTANCE) == TIM3))
 
 /****************** TIM Instances : supporting encoder interface **************/
 #define IS_TIM_ENCODER_INTERFACE_INSTANCE(INSTANCE)  (((INSTANCE) == TIM1)  || \
-                                                      ((INSTANCE) == TIM2)  || \
+                                                      ((INSTANCE) == TIM3)  || \
                                                       ((INSTANCE) == TIM3))
 
 /****************** TIM Instances : supporting Hall sensor interface **********/
 #define IS_TIM_HALL_SENSOR_INTERFACE_INSTANCE(INSTANCE) (((INSTANCE) == TIM1)   || \
-                                                         ((INSTANCE) == TIM2)   || \
+                                                         ((INSTANCE) == TIM3)   || \
                                                          ((INSTANCE) == TIM3))
 
 /**************** TIM Instances : external trigger input available ************/
 #define IS_TIM_ETR_INSTANCE(INSTANCE)      (((INSTANCE) == TIM1)  || \
-                                            ((INSTANCE) == TIM2)  || \
+                                            ((INSTANCE) == TIM3)  || \
                                             ((INSTANCE) == TIM3))
 
 /************* TIM Instances : supporting ETR source selection ***************/
 #define IS_TIM_ETRSEL_INSTANCE(INSTANCE)    (((INSTANCE) == TIM1)  || \
-                                             ((INSTANCE) == TIM2)  || \
+                                             ((INSTANCE) == TIM3)  || \
                                              ((INSTANCE) == TIM3))
 
 /****** TIM Instances : Master mode available (TIMx_CR2.MMS available )********/
 #define IS_TIM_MASTER_INSTANCE(INSTANCE)   (((INSTANCE) == TIM1)  || \
-                                            ((INSTANCE) == TIM2)  || \
+                                            ((INSTANCE) == TIM3)  || \
                                             ((INSTANCE) == TIM3))
 
 /*********** TIM Instances : Slave mode available (TIMx_SMCR available )*******/
 #define IS_TIM_SLAVE_INSTANCE(INSTANCE)    (((INSTANCE) == TIM1)  || \
-                                            ((INSTANCE) == TIM2)  || \
+                                            ((INSTANCE) == TIM3)  || \
                                             ((INSTANCE) == TIM3))
 
 /****************** TIM Instances : supporting OCxREF clear *******************/
 #define IS_TIM_OCXREF_CLEAR_INSTANCE(INSTANCE)        (((INSTANCE) == TIM1) || \
-                                                       ((INSTANCE) == TIM2) || \
+                                                       ((INSTANCE) == TIM3) || \
                                                        ((INSTANCE) == TIM3))
 
 /****************** TIM Instances : supporting bitfield OCCS in SMCR register *******************/
 #define IS_TIM_OCCS_INSTANCE(INSTANCE)                (((INSTANCE) == TIM1)  || \
-                                                       ((INSTANCE) == TIM2)  || \
+                                                       ((INSTANCE) == TIM3)  || \
                                                        ((INSTANCE) == TIM3))
 
 /****************** TIM Instances : remapping capability **********************/
 #define IS_TIM_REMAP_INSTANCE(INSTANCE)    (((INSTANCE) == TIM1)  || \
-                                            ((INSTANCE) == TIM2)  || \
+                                            ((INSTANCE) == TIM3)  || \
                                             ((INSTANCE) == TIM3))
 
 /****************** TIM Instances : supporting repetition counter *************/
@@ -7876,12 +7876,12 @@ typedef struct
 
 /******************* TIM Instances : Timer input XOR function *****************/
 #define IS_TIM_XOR_INSTANCE(INSTANCE)      (((INSTANCE) == TIM1)   || \
-                                            ((INSTANCE) == TIM2)   || \
+                                            ((INSTANCE) == TIM3)   || \
                                             ((INSTANCE) == TIM3))
 
 /******************* TIM Instances : Timer input selection ********************/
 #define IS_TIM_TISEL_INSTANCE(INSTANCE) (((INSTANCE) == TIM1)   || \
-                                         ((INSTANCE) == TIM2)   || \
+                                         ((INSTANCE) == TIM3)   || \
                                          ((INSTANCE) == TIM3)   || \
                                          ((INSTANCE) == TIM14)  || \
                                          ((INSTANCE) == TIM16)  || \
