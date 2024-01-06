@@ -31,8 +31,8 @@
 
 #define SMOOTHING_FACTOR 0.001
 #define KNOCK_THRESHOLD 20
-#define TIMERPSC 16000
-#define TIMERPERIYOD 100
+#define TIMER3PSC 16000
+#define TIMER3PERIYOD 100
 
 typedef struct
 {
@@ -55,7 +55,7 @@ void GPIO_Init(void);
 void I2C_Config(void);
 uint8_t I2C_Read(uint8_t, uint8_t);
 void I2C_Write(uint8_t devAddr, uint8_t regAddr, uint8_t data);
-void delay_ms(uint32_t ms);
+
 uint8_t detect_knock(MPU6050 sensorData);
 
 void TIM3_Clock_Init(void);
@@ -88,7 +88,7 @@ int main(void)
 	data = I2C_Read(MPU6050_ADDRESS, MPU6050_WHO_AM_I);
 	data = I2C_Read(MPU6050_ADDRESS, MPU6050_POWER_MGMT_1);
 	I2C_Write(MPU6050_ADDRESS, MPU6050_POWER_MGMT_1, 0x00);
-	delay_ms(200);
+
 	data = I2C_Read(MPU6050_ADDRESS, MPU6050_POWER_MGMT_1);
 
 	while (1)
@@ -226,12 +226,7 @@ void I2C_Write(uint8_t devAddr, uint8_t regAddr, uint8_t data)
 	I2C1->TXDR = (uint32_t)data;
 }
 
-void delay_ms(uint32_t ms)
-{
-	for (uint32_t i = 0; i < ms * 1000; i++)
-	{ // only wait
-	}
-}
+
 
 uint8_t detect_knock(MPU6050 sensorData)
 {
@@ -250,9 +245,9 @@ void TIM3_Clock_Init(void)
 	RCC->APBENR1 |= RCC_APBENR1_TIM3EN;
 
 	// Set TIM3 prescaler and period
-	TIM3->PSC = TIMERPSC - 1;
+	TIM3->PSC = TIMER3PSC - 1;
 	TIM3->CNT = 0;
-	TIM3->ARR = TIMERPERIYOD - 1;
+	TIM3->ARR = TIMER3PERIYOD - 1;
 }
 void TIM3_Interrupt_Config(void)
 {
