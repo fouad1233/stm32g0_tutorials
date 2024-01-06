@@ -132,6 +132,8 @@ uint16_t accelz;
 uint16_t gyroz;
 
 
+
+
 int main(void){
 	I2C_Config();
 	GPIO_Init();
