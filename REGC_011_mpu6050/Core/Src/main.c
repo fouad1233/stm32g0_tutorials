@@ -6,7 +6,7 @@
 #define MPU6050_WHO_AM_I     0x75
 #define MPU6050_POWER_MGMT_1 0x6B
 
-//
+//ACCELEROMETER REGISTER ADDRESS
 #define MPU6050_ACCEL_XOUT_H 0x3B
 #define MPU6050_ACCEL_XOUT_L 0x3C
 
@@ -16,7 +16,7 @@
 #define MPU6050_ACCEL_ZOUT_H 0x3F
 #define MPU6050_ACCEL_ZOUT_L 0x40
 
-//
+//GYRO REGISTER ADDRESS
 #define MPU6050_GYRO_XOUT_H  0x43
 #define MPU6050_GYRO_XOUT_L  0x44
 
@@ -30,8 +30,6 @@
 void GPIO_Init(void);
 void I2C_Config(void);
 uint8_t I2C_Read(uint8_t,uint8_t);
-
-
 
 void GPIO_Init(void){
 	/* Enable GPIOA */
@@ -86,7 +84,7 @@ uint8_t I2C_Read(uint8_t devAddr,uint8_t regAddr){
     I2C1->TXDR=(uint32_t)regAddr;
     while(!(I2C1->ISR&(1<<6)));//TC
 
-    //READ OPERATION
+    //READ OPERATION(read data)
     I2C1->CR2=0;
     I2C1->CR2|=((uint32_t)devAddr<<1);//slave address
     I2C1->CR2|=(1U<<10);//READ mode
@@ -116,9 +114,7 @@ void I2C_Write(uint8_t devAddr,uint8_t regAddr,uint8_t data){
 
     while(!(I2C1->ISR&(1<<1)));//TXIS
     I2C1->TXDR=(uint32_t)data;
-
 }
-
 
 void delay_ms(uint32_t ms)
 {
@@ -141,17 +137,13 @@ int main(void){
 	GPIO_Init();
 
 	data=I2C_Read(MPU6050_ADDRESS,MPU6050_WHO_AM_I);
-
 	data=I2C_Read(MPU6050_ADDRESS,MPU6050_POWER_MGMT_1);
-
 	I2C_Write(MPU6050_ADDRESS,MPU6050_POWER_MGMT_1,0x00);
 	delay_ms(200);
-
 	data=I2C_Read(MPU6050_ADDRESS,MPU6050_POWER_MGMT_1);
 
-
 	for(;;){
-		    delay_ms(60);
+
 			accelx=I2C_Read(MPU6050_ADDRESS,MPU6050_ACCEL_XOUT_L);
 			accelx=accelx|(I2C_Read(MPU6050_ADDRESS,MPU6050_ACCEL_XOUT_H)<<8);
 			accelx=accelx/16384;
@@ -175,10 +167,9 @@ int main(void){
 			gyroz=I2C_Read(MPU6050_ADDRESS,MPU6050_GYRO_ZOUT_L);
 			gyroz=gyroz|(I2C_Read(MPU6050_ADDRESS,MPU6050_GYRO_ZOUT_H)<<8);
 			gyroz=gyroz/131;
+			delay_ms(80);
 
 }
-
-
 	while(1){
 
 	}
