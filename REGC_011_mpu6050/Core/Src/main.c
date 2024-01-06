@@ -32,21 +32,21 @@ uint8_t I2C_Read(uint8_t, uint8_t);
 void I2C_Write(uint8_t devAddr, uint8_t regAddr, uint8_t data);
 void delay_ms(uint32_t ms);
 
-uint16_t data;
-uint16_t accelx;
-uint16_t gyrox;
-uint16_t accely;
-uint16_t gyroy;
-uint16_t accelz;
-uint16_t gyroz;
+int16_t data;
+int16_t accelx;
+int16_t gyrox;
+int16_t accely;
+int16_t gyroy;
+int16_t accelz;
+int16_t gyroz;
 
 typedef struct
 {
 	float accelx;
-	float gyrox;
 	float accely;
-	float gyroy;
 	float accelz;
+	float gyrox;
+	float gyroy;
 	float gyroz;
 } MPU6050;
 MPU6050 sensorData;
@@ -67,28 +67,29 @@ int main(void)
 
 		accelx = I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_XOUT_L);
 		accelx = accelx | (I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_XOUT_H) << 8);
-		sensorData.accelx = accelx / 16384;
-
-		gyrox = I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_XOUT_L);
-		gyrox = gyrox | (I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_XOUT_H) << 8);
-		sensorData.gyrox = gyrox / 131;
+		sensorData.accelx = (float)(accelx) / 16384;
 
 		accely = I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_YOUT_L);
 		accely = accely | (I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_YOUT_H) << 8);
-		sensorData.accely = accely / 16384;
-
-		gyroy = I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_YOUT_L);
-		gyroy = gyroy | (I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_YOUT_H) << 8);
-		sensorData.gyroy = gyroy / 131;
+		sensorData.accely = (float)(accely) / 16384;
 
 		accelz = I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_ZOUT_L);
 		accelz = accelz | (I2C_Read(MPU6050_ADDRESS, MPU6050_ACCEL_ZOUT_H) << 8);
-		sensorData.accelz = accelz / 16384;
+		sensorData.accelz = (float)(accelz) / 16384;
+
+
+		gyrox = I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_XOUT_L);
+		gyrox = gyrox | (I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_XOUT_H) << 8);
+		sensorData.gyrox = (float)(gyrox) / 131;
+
+		gyroy = I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_YOUT_L);
+		gyroy = gyroy | (I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_YOUT_H) << 8);
+		sensorData.gyroy = (float)(gyroy) / 131;
 
 		gyroz = I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_ZOUT_L);
 		gyroz = gyroz | (I2C_Read(MPU6050_ADDRESS, MPU6050_GYRO_ZOUT_H) << 8);
-		sensorData.gyroz = gyroz / 131;
-		delay_ms(80);
+		sensorData.gyroz = (float)(gyroz) / 131;
+		delay_ms(1);
 	}
 }
 
