@@ -201,7 +201,7 @@ int main(void)
 		{
 			if (detect_knock(sensorData) && soundSensor.adc_value > 3000)
 			{
-				knock_num += detect_knock(sensorData);
+				knock_num += 1;
 				TIM3->CNT = 0;
 				timerFlag = 0;
 			}
@@ -244,7 +244,6 @@ void TIM2_IRQHandler(void)
 		{
 			sevenSegmentShowDigit(digit1, 3);
 		}
-
 
 		// toggle_led();
 
