@@ -127,6 +127,8 @@ Figure 4: RCC_IOPENR register.
 
 ## 2.2 GPIO CONFIGURATIONS
 
+### 2.2.1 Peripherals addresses
+
 GPIOX base addresses were defined as GPIOX_BASE and
 these addresses were accessed to the registers that make the settings on the X
 ports. It is seen that there is an offsett of 0x400 between the ports.
@@ -135,12 +137,16 @@ ports. It is seen that there is an offsett of 0x400 between the ports.
 
 Figure 5: GPIOX address map.
 
+### 2.2.2 GPIO MODER REGISTER
+
 Using GPIOX_BASE addresses, the modes of the pins in
 the MODER registry can be set by accessing the MODER registry with offset 0x00.
 
 ![1707329858639](image/readme/1707329858639.png)
 
 Figure 6: GPIOx_MODER Register
+
+### 2.2.3 GPIO ODR REGISTER
 
 Using GPIOX_BASE addresses, the ODR register is
 accessed with 0x14 Offset and the pins are powered by assigning a value of 1 to
@@ -151,6 +157,13 @@ the relevant bits in the ODR register.
 Figure 7: GPIOx_ODR register
 
 
+### 2.2.4 GPIO IDR REGISTER
+
+Using GPIOX_BASE addresses, the IDR register is accessed with 0x10 Offset and the pins state can read by read this register.
+
+![1707335234522](image/readme/1707335234522.png)
+
+Figure 8: GPIOx_IDR register
 
 # [3 ASSEMBLY_001_led](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_001_led "ASSEMBLY_001_led")
 
@@ -161,7 +174,7 @@ ODR.
 
 ![1707330117382](image/readme/1707330117382.png)
 
-Figure 8: Led on at PA8 pin.
+Figure 9: Led on at PA8 pin.
 
 # [4 ASSEMBLY_002_GPIO_functions](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_002_GPIO_functions "ASSEMBLY_002_GPIO_functions")
 
@@ -176,7 +189,7 @@ relevant pins in ODR were set to 1 and the LED was powered.
 
 ![1707330415566](image/readme/1707330415566.png)
 
-Figure 9: Four led on
+Figure 10: Four led on
 
 
 # [6 ASSEMBLY_004_ledblink](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_004_ledblink "ASSEMBLY_004_ledblink")
@@ -222,4 +235,4 @@ execution time is just 3 cycles.
 
 ![1707330548213](image/readme/1707330548213.png)
 
-Figure 10: Time of instructions Cortex-M0 Technical Reference Manual
+Figure 11: Time of instructions Cortex-M0 Technical Reference Manual
