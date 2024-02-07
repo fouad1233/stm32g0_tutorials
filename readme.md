@@ -236,3 +236,97 @@ execution time is just 3 cycles.
 ![1707330548213](image/readme/1707330548213.png)
 
 Figure 11: Time of instructions Cortex-M0 Technical Reference Manual
+
+
+# [7 ](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_004_ledblink "ASSEMBLY_004_ledblink")[ASSEMBLY_006_onbordled_blink](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_006_onbordled_blink "ASSEMBLY_006_onbordled_blink")
+
+The onboard led is connected to PC6 pin.
+The led is blinking by set the pin high and low with 1s intervals.
+
+## 7.1 Flowchart
+
+![1707335524036](image/readme/1707335524036.png)
+
+Figure 12: flowchart of [ASSEMBLY_006_onbordled_blink](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_006_onbordled_blink "ASSEMBLY_006_onbordled_blink")
+
+# [8 ASSEMBLY_007_onboardled_on_with_button](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_007_onboardled_on_with_button "ASSEMBLY_007_onboardled_on_with_button")
+
+A button is connected to PA0 pin with pull down mode. When the button is pressed,
+the input PA0 pin becomes 1 and the LED connected to the PC6 pin on the board
+lights up. When the button is not pressed, the PA0 pin becomes 0 and the LED
+connected to the PC6 pin on the board does not light.
+
+## 8.1 Schematic
+
+![1707335839539](image/readme/1707335839539.png)
+
+Figure 13: Schematic of [ASSEMBLY_007_onboardled_on_with_button](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_007_onboardled_on_with_button "ASSEMBLY_007_onboardled_on_with_button")
+
+## 8.2 Flowchart
+
+
+![1707335938373](image/readme/1707335938373.png)
+
+Figure 14: Flowchart of [ASSEMBLY_007_onboardled_on_with_button](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_007_onboardled_on_with_button "ASSEMBLY_007_onboardled_on_with_button")
+
+
+# [9 ASSEMBLY_008_8led_blink](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_008_8led_blink "ASSEMBLY_008_8led_blink")
+
+The 8 pins of the B port were set to output mode and connected to the LEDs. LEDs were switched on and off with 1 second intervals.
+
+## 9.1 Schematic
+
+![1707336046692](image/readme/1707336046692.png)
+
+Figure 15: Schematic of [ASSEMBLY_008_8led_blink](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_008_8led_blink "ASSEMBLY_008_8led_blink")
+
+## 9.2 Flowchart
+
+![1707336099014](image/readme/1707336099014.png)
+
+Figure 16: Flowchart of [ASSEMBLY_008_8led_blink](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_008_8led_blink "ASSEMBLY_008_8led_blink")
+
+
+# [10 ASSEMBLY_009_led_rotate](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_009_led_rotate "ASSEMBLY_009_led_rotate")
+
+A button is connected to PA8 with pull down mode and the leds is connected to
+port B starting from PB0 to PB7. First starting from LED0, LED3 was switched on
+with 100 ms intervals. Then a shift pattern is set 0000 0111 for 8 bit as
+initial condition, 1 for leds on and 0 for off. Because registers are 32 bit we
+will do the pattern as 0000 0111 0000 0111 0000 0111 0000 0111.Than using
+rotate instruction, the shifting pattern is implemented. When the button pressed
+the shifting pattern change.
+
+## 10.1 Schematic
+
+![1707336222792](image/readme/1707336222792.png)
+
+Figure 17: Schematic of [ASSEMBLY_009_led_rotate](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_009_led_rotate "ASSEMBLY_009_led_rotate")
+
+## 10.2 Flowchart
+
+![1707336273670](image/readme/1707336273670.png)
+
+Figure 18: Flowchart of [ASSEMBLY_009_led_rotate](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_009_led_rotate "ASSEMBLY_009_led_rotate")
+
+# [11 ASSEMBLY_010_knight_rider](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_010_knight_rider "ASSEMBLY_010_knight_rider")
+
+Leds was connected to the pins of port B. Firstly, starting from LED0, LED3 was
+switched on with 100ms intervals. Then the led numbers were shifted to the
+right with 100ms intervals. With the algorithm created, when LED8 was reached,
+it was shifted towards LED0, and when LED0 was reached, it was shifted towards
+LED8.
+
+## 11.1 Schematic
+
+
+![1707336444918](image/readme/1707336444918.png)
+
+Figure 19: Schematic of [ASSEMBLY_010_knight_rider](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_010_knight_rider "ASSEMBLY_010_knight_rider")
+
+## 11.2 Flowchart
+
+
+![1707336482756](image/readme/1707336482756.png)
+
+Figure 20: Flowchart of [ASSEMBLY_010_knight_rider](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_010_knight_rider "ASSEMBLY_010_knight_rider")
