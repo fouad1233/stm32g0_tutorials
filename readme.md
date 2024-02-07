@@ -330,3 +330,33 @@ Figure 19: Schematic of [ASSEMBLY_010_knight_rider](https://github.com/fouad1233
 ![1707336482756](image/readme/1707336482756.png)
 
 Figure 20: Flowchart of [ASSEMBLY_010_knight_rider](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_010_knight_rider "ASSEMBLY_010_knight_rider")
+
+
+
+# [12 REGC_001_ledblink_systick](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_001_ledblink_systick "REGC_001_ledblink_systick")
+
+
+As a software method we can record SysTick values before and after delay. Hence the difference between
+these values can be calculated. An oscilloscope can be used as a hardware method. Calculating the time difference between the toggled signal frequency at the start and end of the delay. -oscilloscope used for measure the frequencies-
+
+## 12.1 Flowchart
+
+![1707336965709](image/readme/1707336965709.png)
+
+Figure 21: Flowchart of [REGC_001_ledblink_systick](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_001_ledblink_systick "REGC_001_ledblink_systick")
+
+## 12.2 Some important registers
+
+> I cant find it in the stm32g0 referance manuel or datacheet so i tahe these photoes from stm32f4 datasheet.
+
+![1707337402397](image/readme/1707337402397.png)
+
+Figure 22: Reload register 
+
+![1707337428432](image/readme/1707337428432.png)
+
+Figure 23: Current value register
+
+![1707337445216](image/readme/1707337445216.png)
+
+Figure 24: Systick Control and Status Register
