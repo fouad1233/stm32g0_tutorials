@@ -112,8 +112,6 @@ a device is placed in low power mode.
 PLL is a clock generation engine in the MCU which is used to generate the clock
 speed which is much higher than the internal HSI or external clock
 
-
-
 # 2 INTRODUCTION TO PROGRAMMMING Registers (RCC, GPIO)
 
 ## 2.1       RCC Configuration I/O port clock enable register (RCC_IOPENR)
@@ -156,7 +154,6 @@ the relevant bits in the ODR register.
 
 Figure 7: GPIOx_ODR register
 
-
 ### 2.2.4 GPIO IDR REGISTER
 
 Using GPIOX_BASE addresses, the IDR register is accessed with 0x10 Offset and the pins state can read by read this register.
@@ -190,7 +187,6 @@ relevant pins in ODR were set to 1 and the LED was powered.
 ![1707330415566](image/readme/1707330415566.png)
 
 Figure 10: Four led on
-
 
 # [6 ASSEMBLY_004_ledblink](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_004_ledblink "ASSEMBLY_004_ledblink")
 
@@ -237,7 +233,6 @@ execution time is just 3 cycles.
 
 Figure 11: Time of instructions Cortex-M0 Technical Reference Manual
 
-
 # [7 ](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_004_ledblink "ASSEMBLY_004_ledblink")[ASSEMBLY_006_onbordled_blink](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_006_onbordled_blink "ASSEMBLY_006_onbordled_blink")
 
 The onboard led is connected to PC6 pin.
@@ -264,11 +259,9 @@ Figure 13: Schematic of [ASSEMBLY_007_onboardled_on_with_button](https://github.
 
 ## 8.2 Flowchart
 
-
 ![1707335938373](image/readme/1707335938373.png)
 
 Figure 14: Flowchart of [ASSEMBLY_007_onboardled_on_with_button](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_007_onboardled_on_with_button "ASSEMBLY_007_onboardled_on_with_button")
-
 
 # [9 ASSEMBLY_008_8led_blink](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_008_8led_blink "ASSEMBLY_008_8led_blink")
 
@@ -285,7 +278,6 @@ Figure 15: Schematic of [ASSEMBLY_008_8led_blink](https://github.com/fouad1233/s
 ![1707336099014](image/readme/1707336099014.png)
 
 Figure 16: Flowchart of [ASSEMBLY_008_8led_blink](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_008_8led_blink "ASSEMBLY_008_8led_blink")
-
 
 # [10 ASSEMBLY_009_led_rotate](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_009_led_rotate "ASSEMBLY_009_led_rotate")
 
@@ -319,22 +311,17 @@ LED8.
 
 ## 11.1 Schematic
 
-
 ![1707336444918](image/readme/1707336444918.png)
 
 Figure 19: Schematic of [ASSEMBLY_010_knight_rider](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_010_knight_rider "ASSEMBLY_010_knight_rider")
 
 ## 11.2 Flowchart
 
-
 ![1707336482756](image/readme/1707336482756.png)
 
 Figure 20: Flowchart of [ASSEMBLY_010_knight_rider](https://github.com/fouad1233/stm32g0_tutorials/tree/main/ASSEMBLY_010_knight_rider "ASSEMBLY_010_knight_rider")
 
-
-
 # [12 REGC_001_ledblink_systick](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_001_ledblink_systick "REGC_001_ledblink_systick")
-
 
 As a software method we can record SysTick values before and after delay. Hence the difference between
 these values can be calculated. An oscilloscope can be used as a hardware method. Calculating the time difference between the toggled signal frequency at the start and end of the delay. -oscilloscope used for measure the frequencies-
@@ -351,7 +338,7 @@ Figure 21: Flowchart of [REGC_001_ledblink_systick](https://github.com/fouad1233
 
 ![1707337402397](image/readme/1707337402397.png)
 
-Figure 22: Reload register 
+Figure 22: Reload register
 
 ![1707337428432](image/readme/1707337428432.png)
 
@@ -360,3 +347,99 @@ Figure 23: Current value register
 ![1707337445216](image/readme/1707337445216.png)
 
 Figure 24: Systick Control and Status Register
+
+
+
+# [13 REGC_002_timer_interrupt](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_002_timer_interrupt "REGC_002_timer_interrupt")
+
+The TIM2 timer interrupt is used to
+change the state of the LED by tracking the time. The EXTI interrupt is used to
+increase or decrease the blinking rate of the LED when a button is pressed. As
+a result, it realizes an application that uses timer and external interrupts to
+control the LED to blink at a specific speed.
+
+## 13.1 Flowchart
+
+![1707505357246](image/readme/1707505357246.png)
+
+Figure 25: Flowchart of [REGC_002_timer_interrupt](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_002_timer_interrupt "REGC_002_timer_interrupt")
+
+## 13.2 Schematic 
+
+
+![1707505386314](image/readme/1707505386314.png)
+
+Figure 26: Schematic of [REGC_002_timer_interrupt](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_002_timer_interrupt "REGC_002_timer_interrupt")
+
+## 13.3 Important registers
+
+### 13.3.1 TIM2 registers
+
+![1707505918571](image/readme/1707505918571.png)![1707505955536](image/readme/1707505955536.png)
+
+Figure 27: Control register 1 of TIMx
+
+This register is used in the code to enablle or disable timer.To understand the usage you can take a look to **Start_TIM2(void)** function.
+
+![1707506190597](image/readme/1707506190597.png)
+
+![1707506208745](image/readme/1707506208745.png)
+
+Figure 28: TIMx Prescaler register
+
+![1707506348629](image/readme/1707506348629.png)
+
+Figure 28: TIMx Counter register (CNT)
+
+![1707506269863](image/readme/1707506269863.png)
+
+Figure 29: TIMx auto reload register
+
+
+![1707506464747](image/readme/1707506464747.png)
+
+![1707506477306](image/readme/1707506477306.png)
+
+Figure 29: TIMx Interrupt enable register (DIER)
+
+It is used to update interrupt enable.
+
+### 13.3.2 EXTI registers
+
+#### EXTI->EXTICR[1]
+
+![1707507084393](image/readme/1707507084393.png)![1707507102351](image/readme/1707507102351.png)
+
+Figure 30: Extenal interrupt control register (EXTICR)
+
+* **EXTICR (External Interrupt Configuration Register)** : This register is used to select the GPIO port that is connected to the EXTI line. The STM32 microcontrollers have multiple EXTICR registers (EXTICR1, EXTICR2, etc.), each controlling a group of EXTI lines.
+* **`EXTI_EXTICR1_EXTI0_0`** : This specific bit setting in the `EXTICR[1]` register connects EXTI line 0 to GPIO port A. The notation `[1]` seems to be a mistake here since EXTI0 configuration should be in `EXTICR[0]` (assuming EXTICR registers are zero-indexed in your environment). The correct approach to connect EXTI1 to GPIOA Pin 0 would typically involve `EXTICR[0]` and setting the appropriate bits for GPIOA.
+
+#### EXTI->RTSR1
+
+![1707506949173](https://file+.vscode-resource.vscode-cdn.net/Users/fuad/STM32CubeIDE/stm32g0_tutorials/image/readme/1707506949173.png)
+
+Figure 31: Extenal interrupt rising trigger selection register (EXTI_RTSR1)
+
+* **RTSR1 (Rising Trigger Selection Register 1)** : This register is used to enable rising edge triggers on the EXTI lines. Setting a bit in this register selects the corresponding EXTI line to be sensitive to rising edges.
+* **`EXTI_RTSR1_RT0`** : Setting this bit enables EXTI line 0 to trigger an interrupt request on a rising edge.
+
+#### EXTI->FTSR1
+
+![1707507044662](image/readme/1707507044662.png)
+
+Figure 32: Extenal interrupt falling trigger selection register (EXTI_FTSR1)
+
+* **FTSR1 (Falling Trigger Selection Register 1)** : Similar to RTSR1, but for falling edge triggers.
+* **`EXTI_FTSR1_FT0`** : Clearing this bit (`&= ~EXTI_FTSR1_FT0`) ensures that EXTI line 0 will not trigger an interrupt request on a falling edge, making it sensitive to rising edges onlyEXTI->IMR1
+* **IMR1 (Interrupt Mask Register 1)** : This register is used to enable or disable interrupt requests from the EXTI lines.
+* **`EXTI_IMR1_IM0`** : Setting this bit enables interrupt requests from EXTI line 0. This means that when the selected edge (rising, in this case) is detected on EXTI line 0, an interrupt request will be generated.
+
+
+## 13.4 Frequency Calculation
+
+* **PSC (Prescaler Register)** : This register determines the division factor applied to the timer's clock. By slowing down the clock, the timer can count at a slower rate, allowing for longer intervals.
+* **CNT (Counter Register)** : Acts as the core of the timer, incrementing on each clock cycle. When it reaches the value in the ARR, an event can be triggered.
+* **ARR (Auto-Reload Register)** : Specifies the value to which the CNT register resets after reaching its maximum count. This defines the period of the timer's cycle.
+
+The frequency of the timer can be calculated using the formula: `Frequency = Clock / ((PSC + 1) * (ARR + 1))`. Adjusting the PSC and ARR values allows for fine-tuning of the timer's frequency for various applications.
