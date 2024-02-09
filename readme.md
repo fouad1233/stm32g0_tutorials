@@ -348,8 +348,6 @@ Figure 23: Current value register
 
 Figure 24: Systick Control and Status Register
 
-
-
 # [13 REGC_002_timer_interrupt](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_002_timer_interrupt "REGC_002_timer_interrupt")
 
 The TIM2 timer interrupt is used to
@@ -364,8 +362,7 @@ control the LED to blink at a specific speed.
 
 Figure 25: Flowchart of [REGC_002_timer_interrupt](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_002_timer_interrupt "REGC_002_timer_interrupt")
 
-## 13.2 Schematic 
-
+## 13.2 Schematic
 
 ![1707505386314](image/readme/1707505386314.png)
 
@@ -394,7 +391,6 @@ Figure 28: TIMx Counter register (CNT)
 ![1707506269863](image/readme/1707506269863.png)
 
 Figure 29: TIMx auto reload register
-
 
 ![1707506464747](image/readme/1707506464747.png)
 
@@ -435,11 +431,16 @@ Figure 32: Extenal interrupt falling trigger selection register (EXTI_FTSR1)
 * **IMR1 (Interrupt Mask Register 1)** : This register is used to enable or disable interrupt requests from the EXTI lines.
 * **`EXTI_IMR1_IM0`** : Setting this bit enables interrupt requests from EXTI line 0. This means that when the selected edge (rising, in this case) is detected on EXTI line 0, an interrupt request will be generated.
 
-
 ## 13.4 Frequency Calculation
 
 * **PSC (Prescaler Register)** : This register determines the division factor applied to the timer's clock. By slowing down the clock, the timer can count at a slower rate, allowing for longer intervals.
 * **CNT (Counter Register)** : Acts as the core of the timer, incrementing on each clock cycle. When it reaches the value in the ARR, an event can be triggered.
 * **ARR (Auto-Reload Register)** : Specifies the value to which the CNT register resets after reaching its maximum count. This defines the period of the timer's cycle.
 
-The frequency of the timer can be calculated using the formula: `Frequency = Clock / ((PSC + 1) * (ARR + 1))`. Adjusting the PSC and ARR values allows for fine-tuning of the timer's frequency for various applications.
+The frequency of the timer can be calculated using the formula:
+
+`Frequency = Clock / ((PSC + 1) * (ARR + 1))`.
+
+Adjusting the PSC and ARR values allows for fine-tuning of the timer's frequency for various applications.
+
+The clock i 16 Mhz for this application.
