@@ -1,3 +1,7 @@
+
+
+Hi, and welcome to our repo. This repo is prepared for educational purposes. I hope it will be useful and give you an opportunity to learn something and improve yourself. So let's Start!!!!!!!
+
 # 1.Introduction
 
 ## 1.1       Stm32g031k8 nucleo pinout
@@ -445,9 +449,7 @@ Adjusting the PSC and ARR values allows for fine-tuning of the timer's frequency
 
 The clock i 16 Mhz for this application.
 
-
 # [14 REGC_003_seven_segment](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_003_seven_segment "REGC_003_seven_segment")
-
 
 In this problem, pushbutton control
 was provided on the seven segment display using external interrupts. When the
@@ -459,8 +461,6 @@ again during the process, the display will reset and start over.
 
 ![1707508354329](image/readme/1707508354329.png)
 
-
 ## 14.2 Schematic
-
 
 ![1707508414482](image/readme/1707508414482.png)
