@@ -444,3 +444,23 @@ The frequency of the timer can be calculated using the formula:
 Adjusting the PSC and ARR values allows for fine-tuning of the timer's frequency for various applications.
 
 The clock i 16 Mhz for this application.
+
+
+# [14 REGC_003_seven_segment](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_003_seven_segment "REGC_003_seven_segment")
+
+
+In this problem, pushbutton control
+was provided on the seven segment display using external interrupts. When the
+button is pressed, the led on and the display starts to increase starting from
+0, when it reaches 999, it stops and the led off. If the button is pressed
+again during the process, the display will reset and start over.
+
+## 14.1 Flowchart
+
+![1707508354329](image/readme/1707508354329.png)
+
+
+## 14.2 Schematic
+
+
+![1707508414482](image/readme/1707508414482.png)
