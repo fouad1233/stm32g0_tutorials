@@ -15,7 +15,7 @@ labeled with Dx and pins that can read analog signals with ADC is labeled with A
 
 ## 1.2       On board IC’s
 
-   ![1707329308488](https://file+.vscode-resource.vscode-cdn.net/Users/fuad/STM32CubeIDE/stm32g0_tutorials/image/readme/1707329308488.png)
+   ![1707509094773](image/readme/1707509094773.png)
 
     Figure 2: Stm32g031k8 nucleo board back
 
