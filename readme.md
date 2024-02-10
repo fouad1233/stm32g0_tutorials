@@ -1,5 +1,3 @@
-
-
 Hi, and welcome to our repo. This repo is prepared for educational purposes. I hope it will be useful and give you an opportunity to learn something and improve yourself. So let's Start!!!!!!!
 
 # 1.Introduction
@@ -461,6 +459,43 @@ again during the process, the display will reset and start over.
 
 ![1707508354329](image/readme/1707508354329.png)
 
+Figure 33: Flowchart of [REGC_003_seven_segment](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_003_seven_segment "REGC_003_seven_segment")
+
 ## 14.2 Schematic
 
 ![1707508414482](image/readme/1707508414482.png)
+
+Figure 34: Schematic of [REGC_003_seven_segment](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_003_seven_segment "REGC_003_seven_segment")
+
+# [15 REGC_004_ledblink_watchdog](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_004_ledblink_watchdog "REGC_004_ledblink_watchdog")
+
+For the independent watchdog timer,
+the time is set according to the following parameters and the blinking of the
+led is tested. If the set time is exceeded and the watchdog is not refreshed,
+the system will be reset.
+
+## 15.1 Important registers
+
+![1707545590453](image/readme/1707545590453.png)
+
+Figure 35: IWDG key Register (IWDG_KR)
+
+![1707545598257](image/readme/1707545598257.png)
+
+Figure 36: IWDG Prescaler Register (IWDG_PR)
+
+![1707545607631](image/readme/1707545607631.png)
+
+Figure 37: IWDG Reload Register (IWDG_RLR)
+
+## 15.2 Independent Watchdog time calculation
+
+![1707545622491](image/readme/1707545622491.png)
+
+Figure 38: time calculation
+
+### 15.3 Flowchart
+
+![1707546307525](image/readme/1707546307525.png)
+
+Figure 39: flowchart of [REGC_004_ledblink_watchdog](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_004_ledblink_watchdog "REGC_004_ledblink_watchdog")
