@@ -596,3 +596,37 @@ Figure 45: Flowchart of [REGC_007_pwm](https://github.com/fouad1233/stm32g0_tuto
 ![1707648867853](image/readme/1707648867853.png)
 
 Figure 46: Schematic of [REGC_007_pwm](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_007_pwm "REGC_007_pwm")
+
+
+# [19 REGC_008_withkeypad](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_008_withkeypad "REGC_008_withkeypad")
+
+The columns of the keypad were set as output and rows as input.
+Columns were connected to EXTI and keypad keys were controlled. First the
+column was determined from the incoming interrupt, then the rows were
+controlled and the key pressed was determined. Significant numbers entered were
+stored until "# came. Significant values between 0 and 100 affected the
+duty cycle, while other meaningless values and signs gave a warning. PWM was
+controlled with TIM2, UART was controlled with TIM3.
+
+![1707649046134](image/readme/1707649046134.png)
+
+Figure 47 : Duty cycle of pwm signal
+
+The internal structure of 4X4 KEYPAD MODULE is shown below.
+
+![1707649076103](image/readme/1707649076103.png)
+
+Figure 48 : Keypad circuit model
+
+
+## 18.1 Flowchart
+
+![1707649115142](image/readme/1707649115142.png)
+
+Figure 49 : Flowchart of [REGC_008_withkeypad](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_008_withkeypad "REGC_008_withkeypad")
+
+## 18.2 Schematic
+
+![1707649155489](image/readme/1707649155489.png)
+
+Figure 50: Schematic of [REGC_008_withkeypad](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_008_withkeypad "REGC_008_withkeypad")
