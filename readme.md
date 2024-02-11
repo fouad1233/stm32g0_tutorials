@@ -441,7 +441,7 @@ Figure 32: Extenal interrupt falling trigger selection register (EXTI_FTSR1)
 
 The frequency of the timer can be calculated using the formula:
 
-`Frequency = Clock / ((PSC + 1) * (ARR + 1))`.
+`Frequency = Clock / ((PSC + 1) * (ARR ))`.
 
 Adjusting the PSC and ARR values allows for fine-tuning of the timer's frequency for various applications.
 
@@ -516,4 +516,83 @@ Figure 40: flowchart of [REGC_005_seven_segment_with_watchdog](https://github.co
 
 ![1707648158932](image/readme/1707648158932.png)
 
-Figure 41: flowchart of [REGC_005_seven_segment_with_watchdog](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_005_seven_segment_with_watchdog "REGC_005_seven_segment_with_watchdog")
+Figure 41: Schematic of [REGC_005_seven_segment_with_watchdog](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_005_seven_segment_with_watchdog "REGC_005_seven_segment_with_watchdog")
+
+
+
+# [17 REGC_006_uart](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_006_uart "REGC_006_uart")
+
+The aim of this project is creating the functions of transmitting and receiving data.
+
+   When we observe the code, first GPIOA,
+USART2 module clocks and PA2, PA3 pins are enabled from RCC. Then PA2 and PA3
+pins settled as alternate function for the USART2 module. CR1 control register
+choose from datasheet at enabling receive and transmit from USART2 module. TDR
+and RDR registers used at data transmit and receive processes respectively.
+Baud rate settled to 9600 bps assuming clock is running at 16Mhz. Value chosen
+according to the formula of baud rate and EISA RS-232 communication Standard.
+
+Baud Rate = APBxCLK
+/ USARTx
+
+    Some of the standard baud rates: 300, 600,
+1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200, 230400, 460800.
+
+## 17.1 Flowchart
+
+![1707648536707](image/readme/1707648536707.png)
+
+Figure 42: Flowchart of [REGC_006_uart](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_006_uart "REGC_006_uart")
+
+
+# [18 REGC_007_pwm](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_007_pwm "REGC_007_pwm")
+
+Pulse Width Modulation is a technique used to encode information in the duration of a pulse
+signal. By changing the duty cycle of the PWM signal LED brightness can be
+changed.
+
+![1707648646829](image/readme/1707648646829.png)
+
+Figure 43: Duty cycle led brightness relationship
+
+PWM involves rapidly toggling a digital signal between
+high and low states. The frequency of the PWM signal can calculated by the
+above formula:
+
+![1707648710500](image/readme/1707648710500.png)
+
+Figure 44: PWM frequency formula
+
+To set the PWM frequency to 1 Khz, because the clock is
+default 16Mhz, PSC register value is set as 15, and ARR register value as 1000.
+To set the duty cycle the CCR register value can changed. The duty cycle
+percentage can be calculated by the above formula:
+
+![1707648762328](image/readme/1707648762328.png)
+
+Figure 44: PWM Duty cycle formula
+
+So as an example, to set duty cycle to 40% CCR value must
+be equal to 400. 
+
+TIM2 is used to generate the PWM signal, and the
+interrupt is activated. In the interrupt the duty cycle of the PWM signal is
+updated. By using the Systick timer a counter is increased and decreased. The
+counter is set as PWM duty cycle in the TIM2 interrupt. So, every 1ms the
+counter increase by 1, this is equal to 0.1% of duty cycle.
+
+
+## 18.1 Flowchart
+
+
+![1707648808923](image/readme/1707648808923.png)
+
+Figure 45: Flowchart of [REGC_007_pwm](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_007_pwm "REGC_007_pwm")
+
+
+## 18.2 Schematic
+
+
+![1707648867853](image/readme/1707648867853.png)
+
+Figure 46: Schematic of [REGC_007_pwm](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_007_pwm "REGC_007_pwm")
