@@ -654,4 +654,37 @@ Figure 51 : Flowchart of [REGC_009_ADC_POT_PWM_led_control](https://github.com/f
 
 ![1707651936687](image/readme/1707651936687.png)
 
-Figure 51 : Schematic of [REGC_009_ADC_POT_PWM_led_control](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_009_ADC_POT_PWM_led_control "REGC_009_ADC_POT_PWM_led_control")
+Figure 52 : Schematic of [REGC_009_ADC_POT_PWM_led_control](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_009_ADC_POT_PWM_led_control "REGC_009_ADC_POT_PWM_led_control")
+
+
+# [21 REGC_012_knock_detector](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_012_knock_detector "REGC_012_knock_detector")
+
+In this problem, the sound sensor
+and the IMU sensor is combined to detect knock and write the number of the
+knocks to the seven-segment display. The IMU sensor data, acceleration and gyro
+for each axis is read using I2C protocol. The gyro is measuring the angle
+velocity from 0 to 250 degree per second. Always the sensor is read, and smooth
+data is obtained by using exponential smoothing, by a factor of 0.001. When the
+instant value of the gyro in one of any axes is far then the smooth gyro data 20
+degree/second, it’s mean that a vibration detected and it’s that the IMU say
+that is a possible knock. Then the sound data is read from sound sensor if a
+high sound detected that is a possible knock. If at the same time the IMU
+sensor and the sound sensor detect a possible knock that’s mean that’s really
+knock and the knock counter increase. Then the timer flag is set to zero and
+timer 3 counter set to 0. After 100ms the timer flag will set to 1 inside the
+interrupt. The knock check will only be done if the flag value is 1. This
+method avoid blocking delay and the debouncing of knock checking.
+
+To make this project [REGC_010_sound_sensor_ADC](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_010_sound_sensor_ADC "REGC_010_sound_sensor_ADC") and [REGC_011_mpu6050](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_011_mpu6050 "REGC_011_mpu6050") is used.
+
+## 21.1 Flowchart
+
+![1707659047400](image/readme/1707659047400.png)
+
+Figure 53 : Flowchart of [REGC_012_knock_detector](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_012_knock_detector "REGC_012_knock_detector")
+
+## 21.2 Schematic
+
+![1707659078288](image/readme/1707659078288.png)
+
+Figure 54 : Schematic of [REGC_012_knock_detector](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_012_knock_detector "REGC_012_knock_detector")
