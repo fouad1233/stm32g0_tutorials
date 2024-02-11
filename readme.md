@@ -494,8 +494,26 @@ Figure 37: IWDG Reload Register (IWDG_RLR)
 
 Figure 38: time calculation
 
-### 15.3 Flowchart
+## 15.3 Flowchart
 
 ![1707546307525](image/readme/1707546307525.png)
 
 Figure 39: flowchart of [REGC_004_ledblink_watchdog](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_004_ledblink_watchdog "REGC_004_ledblink_watchdog")
+
+
+# [16 REGC_005_seven_segment_with_watchdog](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_005_seven_segment_with_watchdog "REGC_005_seven_segment_with_watchdog")
+
+The system was tested by adding watchdog timer while working as in [REGC_003_seven_segment](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_003_seven_segment "REGC_003_seven_segment") . If the watchdog timer time is made 16 s and watchdog refresh is not done within this time, the screen is reset and starts counting from the beginning.
+
+## 16.1 Flowchart
+
+
+![1707648136160](image/readme/1707648136160.png)
+
+Figure 40: flowchart of [REGC_005_seven_segment_with_watchdog](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_005_seven_segment_with_watchdog "REGC_005_seven_segment_with_watchdog")
+
+## 16.2 Schematic
+
+![1707648158932](image/readme/1707648158932.png)
+
+Figure 41: flowchart of [REGC_005_seven_segment_with_watchdog](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_005_seven_segment_with_watchdog "REGC_005_seven_segment_with_watchdog")
