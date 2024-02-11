@@ -630,3 +630,28 @@ Figure 49 : Flowchart of [REGC_008_withkeypad](https://github.com/fouad1233/stm3
 ![1707649155489](image/readme/1707649155489.png)
 
 Figure 50: Schematic of [REGC_008_withkeypad](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_008_withkeypad "REGC_008_withkeypad")
+
+
+# [20 REGC_009_ADC_POT_PWM_led_control](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_009_ADC_POT_PWM_led_control "REGC_009_ADC_POT_PWM_led_control")
+
+    The STM32G0 microcontroller reads analog
+signal with ADC from the pot connected to pin PA12, converts the ADC values to
+voltage, and set the duty cycles of the 2 PWM channels according to the ADC
+value. Each led is connected to PWM channel at pins PA15 and PB3. When the pot
+is turned to the left the ADC value will be 0 and the left led will bright with
+a full brightness (full duty cycle) when turning to the right the brightness of
+the left led decrease. At the middle the left led turn off, then when turning
+to the right the right led will turn on from low to high brightness according
+to the PWM signal duty cycle.
+
+## 20.1 Flowchart
+
+![1707651900272](image/readme/1707651900272.png)
+
+Figure 51 : Flowchart of [REGC_009_ADC_POT_PWM_led_control](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_009_ADC_POT_PWM_led_control "REGC_009_ADC_POT_PWM_led_control")
+
+## 20.2 Schematic
+
+![1707651936687](image/readme/1707651936687.png)
+
+Figure 51 : Schematic of [REGC_009_ADC_POT_PWM_led_control](https://github.com/fouad1233/stm32g0_tutorials/tree/main/REGC_009_ADC_POT_PWM_led_control "REGC_009_ADC_POT_PWM_led_control")
