@@ -1,5 +1,7 @@
 Hi, and welcome to our repo. This repo is prepared for educational purposes. I hope it will be useful and give you an opportunity to learn something and improve yourself. So let's Start!!!!!!!
 
+You can read this also from the pdf for **readme.pdf** !!! (The pdf is auto generated so sorry if some parts look bad)
+
 # 1.Introduction
 
 ## 1.1       Stm32g031k8 nucleo pinout
@@ -22,7 +24,7 @@ For ST-link a stm32f103 IC is used and is connected to the back of the nucelo
 board. The stm32g0 IC operate at 3.3V because of it a 5V 3.3V regulator appear
 on the board. A 16Mhz oscillator appear to clock the stm32g0.
 
-## 1.3       Peripherals andtheir usage
+## 1.3       Peripherals and their usage
 
 ### 1.3.1      GPIOs:
 
