@@ -1,5 +1,7 @@
 Hi, and welcome to our repo. This repo is prepared for educational purposes. I hope it will be useful and give you an opportunity to learn something and improve yourself. So let's Start!!!!!!!
 
+Big thanks to Büşra Ülker [@busraulker](https://github.com/busraulker) for their contributions to this repository
+
 You can read this also from the pdf for **readme.pdf** !!! (The pdf is auto generated so sorry if some parts look bad)
 
 # 1.Introduction
